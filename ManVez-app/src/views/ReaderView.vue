@@ -48,7 +48,7 @@ const hasNext = computed(() => currentIndex.value < chapters.value.length - 1)
 
 async function loadChapters() {
   const res = await axios.get(
-    `https://api.mangadex.org/manga/${route.params.mangaId}/feed?limit=100&translatedLanguage[]=en&order[chapter]=desc`
+    `/api/mangadex/manga/${route.params.mangaId}/feed?limit=100&translatedLanguage[]=en&order[chapter]=desc`
   )
   chapters.value = res.data.data
   if (chapters.value.length > 0) {
@@ -60,7 +60,7 @@ async function loadChapters() {
 async function loadChapter() {
   loading.value = true
   try {
-    const res = await axios.get(`https://api.mangadex.org/at-home/server/${currentChapter.value}`)
+    const res = await axios.get(`/api/mangadex/at-home/server/${currentChapter.value}`)
     const { baseUrl, chapter } = res.data
     pages.value = chapter.data.map(
       filename => `${baseUrl}/data/${chapter.hash}/${filename}`

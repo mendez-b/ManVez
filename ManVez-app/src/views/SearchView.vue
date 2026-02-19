@@ -80,7 +80,7 @@ async function search() {
   loading.value = true
   searched.value = true
   try {
-    let url = `https://api.mangadex.org/manga?limit=20&includes[]=cover_art&contentRating[]=safe`
+    let url = `/api/mangadex/manga?limit=20&includes[]=cover_art&contentRating[]=safe`
     if (query.value.trim()) url += `&title=${encodeURIComponent(query.value)}`
     selectedGenres.value.forEach(g => { url += `&includedTags[]=${g}` })
     

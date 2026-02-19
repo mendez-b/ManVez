@@ -38,7 +38,7 @@ const recentMangas = ref([])
 const loadingPopular = ref(true)
 const loadingRecent = ref(true)
 
-const BASE = 'https://api.mangadex.org'
+const BASE = '/api/mangadex'
 const INCLUDES = 'includes[]=cover_art'
 
 onMounted(async () => {
