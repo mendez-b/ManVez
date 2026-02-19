@@ -1,0 +1,45 @@
+/* Variables de color — aquí defines la paleta */
+:root {
+  --bg-primary: #0a0f1e;      /* Azul noche — fondo principal */
+  --bg-secondary: #111827;    /* Fondo de tarjetas */
+  --bg-card: #1a2235;         /* Fondo de cards */
+  --accent: #7c3aed;          /* Morado — color de acento */
+  --accent-hover: #6d28d9;
+  --text-primary: #f1f5f9;    /* Texto principal */
+  --text-secondary: #94a3b8;  /* Texto secundario */
+  --border: #1e293b;
+}
+
+/* Tema claro (opcional, para el switch de tema) */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #e2e8f0;
+  --bg-card: #ffffff;
+  --accent: #7c3aed;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border: #cbd5e1;
+}
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', sans-serif;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
