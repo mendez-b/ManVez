@@ -3,8 +3,8 @@
   --bg-primary: #0a0f1e;      /* Azul noche — fondo principal */
   --bg-secondary: #111827;    /* Fondo de tarjetas */
   --bg-card: #1a2235;         /* Fondo de cards */
-  --accent: #7c3aed;          /* Morado — color de acento */
-  --accent-hover: #6d28d9;
+  --accent: #024F32;          /* Troll green — color de acento */
+  --accent-hover: #023E2A;
   --text-primary: #f1f5f9;    /* Texto principal */
   --text-secondary: #94a3b8;  /* Texto secundario */
   --border: #1e293b;
@@ -15,7 +15,7 @@
   --bg-primary: #f8fafc;
   --bg-secondary: #e2e8f0;
   --bg-card: #ffffff;
-  --accent: #7c3aed;
+  --accent: #024F32;
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --border: #cbd5e1;

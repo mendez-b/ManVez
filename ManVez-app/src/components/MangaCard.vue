@@ -51,7 +51,7 @@ const lastChapter = computed(() => {
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 8px 24px rgba(26, 173, 75, 0.3);
 }
 
 .card-img {
@@ -69,7 +69,7 @@ const lastChapter = computed(() => {
 .card-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(124, 58, 237, 0.7);
+  background: rgba(38, 192, 115, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
