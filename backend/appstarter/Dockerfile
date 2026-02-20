@@ -1,15 +1,17 @@
-FROM php:8.2-cli
+FROM php:8.2-apache
 
 RUN apt-get update && apt-get install -y \
     libicu-dev \
     libzip-dev \
     unzip \
     curl \
-    && docker-php-ext-install intl zip curl
+    && docker-php-ext-install intl zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /app
+WORKDIR /var/www/html
 
 COPY . .
 
