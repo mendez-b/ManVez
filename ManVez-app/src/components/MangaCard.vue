@@ -13,6 +13,7 @@
   </RouterLink>
 </template>
 
+
 <script setup>
 import { computed } from 'vue'
 
@@ -21,23 +22,17 @@ const props = defineProps({
 })
 
 const title = computed(() => {
-  return props.manga.attributes.title.en || 
-         Object.values(props.manga.attributes.title)[0] || 
+  return props.manga.attributes.title.en ||
+         Object.values(props.manga.attributes.title)[0] ||
          'Sin título'
 })
 
-  const coverRel = props.manga.relationships?.find(r => r.type === 'cover_art')
-  if (coverRel?.attributes?.fileName) {
-    return `https://uploads.mangadex.org/covers/${props.manga.id}/${coverRel.attributes.fileName}.256.jpg`
-  }
-  return 'https://placehold.co/256x360/1a2235/7c3aed?text=Sin+Cover'
-})
 const coverUrl = computed(() => {
   const coverRel = props.manga.relationships?.find(r => r.type === 'cover_art')
   if (coverRel?.attributes?.fileName) {
     return `/covers/${props.manga.id}/${coverRel.attributes.fileName}.256.jpg`
   }
-  return 'https://placehold.co/256x360/1a2235/7c3aed?text=Sin+Cover'
+  return 'https://placehold.co/256x360/1a2235/024F32?text=Sin+Cover'
 })
 
 const lastChapter = computed(() => {
