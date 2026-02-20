@@ -16,9 +16,8 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader \
-    && chown -R www-data:www-data /var/www/html
+EXPOSE 10000
 
-EXPOSE 80
+ENV PORT=10000
 
 CMD ["apache2-foreground"]
