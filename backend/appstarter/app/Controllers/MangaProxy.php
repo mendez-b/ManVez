@@ -8,7 +8,6 @@ class MangaProxy extends Controller
 {
     private $baseUrl = 'https://api.mangadex.org';
 
-    // Proxy para la API
     public function api()
     {
         $path = $this->request->getGet('path');
@@ -17,43 +16,40 @@ class MangaProxy extends Controller
         $url = $this->baseUrl . $path;
         if ($query) $url .= '?' . $query;
 
-        $client = \Config\Services::curlrequest();
+        $result = $this->curlGet($url);
         
-        try {
-            $response = $client->get($url, [
-                'headers' => ['Accept' => 'application/json']
-            ]);
-            
-            return $this->response
-                ->setHeader('Access-Control-Allow-Origin', '*')
-                ->setHeader('Content-Type', 'application/json')
-                ->setBody($response->getBody());
-        } catch (\Exception $e) {
-            return $this->response
-                ->setStatusCode(500)
-                ->setJSON(['error' => $e->getMessage()]);
-        }
+        return $this->response
+            ->setHeader('Access-Control-Allow-Origin', '*')
+            ->setHeader('Content-Type', 'application/json')
+            ->setBody($result);
     }
 
-    // Proxy para las portadas
     public function cover($mangaId, $fileName)
     {
         $url = "https://uploads.mangadex.org/covers/{$mangaId}/{$fileName}";
+        $result = $this->curlGet($url, true);
         
-        $client = \Config\Services::curlrequest();
-        
-        try {
-            $response = $client->get($url);
-            $contentType = $response->getHeader('content-type');
-            
-            return $this->response
-                ->setHeader('Access-Control-Allow-Origin', '*')
-                ->setHeader('Content-Type', $contentType)
-                ->setBody($response->getBody());
-        } catch (\Exception $e) {
-            return $this->response
-                ->setStatusCode(404)
-                ->setBody('Imagen no encontrada');
-        }
+        return $this->response
+            ->setHeader('Access-Control-Allow-Origin', '*')
+            ->setHeader('Content-Type', 'image/jpeg')
+            ->setBody($result);
+    }
+
+    private function curlGet($url, $binary = false)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+       curl_setopt($ch, CURLOPT_HTTPHEADER, [
+         'Accept: application/json',
+         'User-Agent: ManVez/1.0'
+         ]);
+        if ($binary) curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return $result;
     }
 }
