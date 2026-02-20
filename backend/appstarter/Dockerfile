@@ -15,6 +15,7 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-EXPOSE 10000
+RUN chmod +x start.sh
 
-CMD php spark serve --host 0.0.0.0 --port ${PORT:-10000}
+EXPOSE 10000
+CMD ["/bin/bash", "start.sh"]
