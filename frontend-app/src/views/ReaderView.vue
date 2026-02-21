@@ -10,6 +10,10 @@
     </div>
 
     <div v-if="loading" class="loading">Cargando capítulo...</div>
+
+    <div v-else-if="chapters.length === 0" class="empty">
+    Este manga no tiene capítulos disponibles en español o inglés.
+</div>
     
     <div v-else class="pages">
       <img 
@@ -49,15 +53,16 @@ const hasNext = computed(() => currentIndex.value < chapters.value.length - 1)
 
 async function loadChapters() {
   const res = await axios.get(
-    `${BASE}?path=/manga/${route.params.mangaId}/feed&query=limit=100%26translatedLanguage[]=en%26order[chapter]=desc`
+    `${BASE}?path=/manga/${route.params.mangaId}/feed&query=limit=100%26translatedLanguage[]=en%26translatedLanguage[]=es%26order[chapter]=desc`
   )
   chapters.value = res.data.data
   if (chapters.value.length > 0) {
     currentChapter.value = chapters.value[0].id
     await loadChapter()
+  } else {
+    loading.value = false
   }
 }
-
 async function loadChapter() {
   loading.value = true
   try {
@@ -95,6 +100,13 @@ onMounted(loadChapters)
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
 }
 
 .reader-header {
