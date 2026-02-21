@@ -18,6 +18,9 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
+RUN mkdir -p writable/cache writable/logs writable/session writable/uploads \
+    && chmod -R 777 writable/
+
 EXPOSE 10000
 
 ENV PORT=10000
