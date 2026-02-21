@@ -51,6 +51,7 @@ import { useRoute } from 'vue-router'
 import axios from 'axios'
 import MangaCard from '../components/MangaCard.vue'
 
+const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
 const route = useRoute()
 const query = ref('')
 const results = ref([])
@@ -80,11 +81,11 @@ async function search() {
   loading.value = true
   searched.value = true
   try {
-    let url = `https://manvez-backend.onrender.com/api/mangadex/manga?limit=20&includes[]=cover_art&contentRating[]=safe`
-    if (query.value.trim()) url += `&title=${encodeURIComponent(query.value)}`
-    selectedGenres.value.forEach(g => { url += `&includedTags[]=${g}` })
+    let queryParams = `limit=20%26includes[]=cover_art%26contentRating[]=safe`
+    if (query.value.trim()) queryParams += `%26title=${encodeURIComponent(query.value)}`
+    selectedGenres.value.forEach(g => { queryParams += `%26includedTags[]=${g}` })
     
-    const res = await axios.get(url)
+    const res = await axios.get(`${BASE}?path=/manga&query=${queryParams}`)
     results.value = res.data.data
   } catch (err) {
     console.error(err)

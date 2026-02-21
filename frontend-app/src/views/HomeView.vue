@@ -43,16 +43,14 @@ const INCLUDES = 'includes[]=cover_art'
 
 onMounted(async () => {
   try {
-    // Mangas populares (ordenados por seguidos)
     const popRes = await axios.get(
-      `${BASE}/manga?limit=12&order[followedCount]=desc&${INCLUDES}&contentRating[]=safe`
+      `${BASE}?path=/manga&query=limit=12%26order[followedCount]=desc%26includes[]=cover_art%26contentRating[]=safe`
     )
     popularMangas.value = popRes.data.data
     loadingPopular.value = false
 
-    // Mangas actualizados recientemente
     const recRes = await axios.get(
-      `${BASE}/manga?limit=12&order[updatedAt]=desc&${INCLUDES}&contentRating[]=safe`
+      `${BASE}?path=/manga&query=limit=12%26order[updatedAt]=desc%26includes[]=cover_art%26contentRating[]=safe`
     )
     recentMangas.value = recRes.data.data
     loadingRecent.value = false

@@ -34,6 +34,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
+const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
 const route = useRoute()
 const chapters = ref([])
 const currentChapter = ref(null)
@@ -48,7 +49,7 @@ const hasNext = computed(() => currentIndex.value < chapters.value.length - 1)
 
 async function loadChapters() {
   const res = await axios.get(
-    `https://manvez-backend.onrender.com/api/mangadex/manga/${route.params.mangaId}/feed?limit=100&translatedLanguage[]=en&order[chapter]=desc`
+    `${BASE}?path=/manga/${route.params.mangaId}/feed&query=limit=100%26translatedLanguage[]=en%26order[chapter]=desc`
   )
   chapters.value = res.data.data
   if (chapters.value.length > 0) {
@@ -60,7 +61,7 @@ async function loadChapters() {
 async function loadChapter() {
   loading.value = true
   try {
-    const res = await axios.get(`https://manvez-backend.onrender.com/api/mangadex/at-home/server/${currentChapter.value}`)
+    const res = await axios.get(`${BASE}?path=/at-home/server/${currentChapter.value}&query=`)
     const { baseUrl, chapter } = res.data
     pages.value = chapter.data.map(
       filename => `${baseUrl}/data/${chapter.hash}/${filename}`
