@@ -30,11 +30,12 @@ const title = computed(() => {
 const coverUrl = computed(() => {
   const coverRel = props.manga.relationships?.find(r => r.type === 'cover_art')
   if (coverRel?.attributes?.fileName) {
-    return `https://manvez-backend.onrender.com/covers/${props.manga.id}/${coverRel.attributes.fileName}.256.jpg`
+    const mangaId = props.manga.id
+    const fileName = coverRel.attributes.fileName
+    return `https://og.mangadex.org/og-image/manga/${mangaId}`
   }
-  return 'https://placehold.co/256x360/1a2235/024F32?text=Sin+Cover'
+  return 'https://placehold.co/256x360/0a0f1e/024F32?text=Sin+Cover'
 })
-
 const lastChapter = computed(() => {
   const chapter = props.manga.attributes.lastChapter
   return chapter ? `Capítulo ${chapter}` : 'En curso'
