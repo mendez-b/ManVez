@@ -66,13 +66,25 @@ async function loadChapters() {
 async function loadChapter() {
   loading.value = true
   try {
-    const res = await axios.get(`${BASE}?path=/at-home/server/${currentChapter.value}&query=`)
-    const { baseUrl, chapter } = res.data
-    pages.value = chapter.data.map(
-      filename => `${baseUrl}/data/${chapter.hash}/${filename}`
+    const res = await axios.get(
+      `${BASE}?path=/at-home/server/${currentChapter.value}&query=`
     )
+    const { baseUrl, chapter } = res.data
+    
+    if (chapter && chapter.data && chapter.data.length > 0) {
+      pages.value = chapter.data.map(
+        filename => `${baseUrl}/data/${chapter.hash}/${filename}`
+      )
+    } else if (chapter && chapter.dataSaver && chapter.dataSaver.length > 0) {
+      pages.value = chapter.dataSaver.map(
+        filename => `${baseUrl}/data-saver/${chapter.hash}/${filename}`
+      )
+    } else {
+      pages.value = []
+    }
   } catch (err) {
     console.error(err)
+    pages.value = []
   } finally {
     loading.value = false
   }
