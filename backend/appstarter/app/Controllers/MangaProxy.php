@@ -7,6 +7,13 @@ use CodeIgniter\Controller;
 class MangaProxy extends Controller
 {
     private $baseUrl = 'https://api.mangadex.org';
+    
+    public function __construct()
+{
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+}
 
     public function api()
     {
