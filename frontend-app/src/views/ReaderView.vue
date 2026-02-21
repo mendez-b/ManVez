@@ -53,7 +53,7 @@ const hasNext = computed(() => currentIndex.value < chapters.value.length - 1)
 
 async function loadChapters() {
   const res = await axios.get(
-    `${BASE}?path=/manga/${route.params.mangaId}/feed&query=limit=100%26translatedLanguage[]=es%26order[chapter]=desc`
+    `${BASE}?path=/manga/${route.params.mangaId}/feed&query=limit=100%26translatedLanguage[]=en%26translatedLanguage[]=es%26order[chapter]=desc`
   )
   chapters.value = res.data.data
   if (chapters.value.length > 0) {
