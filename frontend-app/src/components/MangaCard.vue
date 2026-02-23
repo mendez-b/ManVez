@@ -1,5 +1,5 @@
 <template>
-  <RouterLink :to="`/read/${manga.id}/first`" class="card">
+  <RouterLink :to="`/manga/${manga.id}`" class="card">
     <div class="card-img">
       <img :src="coverUrl" :alt="title" loading="lazy" />
       <div class="card-overlay">
