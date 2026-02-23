@@ -61,7 +61,7 @@ const selectedGenres = ref([])
 
 // Géneros más comunes de MangaDex (IDs reales)
 const genres = [
-  { id: '391b0423-d847-456f-aff0-8b0cfc03066b', name: 'Acción' },
+    { id: '391b0423-d847-456f-aff0-8b0cfc03066b', name: 'Acción' },
   { id: 'e5301a23-ebd9-49dd-a0cb-2add944c7fe9', name: 'Aventura' },
   { id: '4d32cc48-9f00-4cca-9b5a-a839f0764984', name: 'Comedia' },
   { id: 'b9af3a63-f058-46de-a9a0-e0c13906197a', name: 'Drama' },
@@ -69,6 +69,22 @@ const genres = [
   { id: 'f8f62932-27da-4fe4-8ee1-6779a8c5edba', name: 'Romance' },
   { id: '07251805-a27e-4d59-b488-f0bfbec15168', name: 'Sobrenatural' },
   { id: '256c8bd9-4904-4360-bf4f-508a76d67183', name: 'Sci-Fi' },
+  { id: 'db9ce55f-8370-4478-9b3b-f3b453a4b4d8', name: 'Slice of Life' },
+  { id: '36fd93ea-e8b8-4741-a9a3-2a3c1b8ef2a5', name: 'Misterio' },
+  { id: 'ee968100-4191-4968-93d3-f82d72be7e46', name: 'Horror' },
+  { id: 'cdad7e68-1419-41d4-b401-16cb21ba7905', name: 'Psicológico' },
+  { id: '5ca48985-9a9d-4bd8-be29-80dc0303db72', name: 'Deportes' },
+  { id: 'a1f53773-c69a-4ce5-8cab-fffcd90b1565', name: 'Magia' },
+  { id: '87cc87cd-a395-47af-b27a-93258283bbc6', name: 'Mecha' },
+  { id: 'aafb99c1-7f60-43fa-b75f-fc9502ce29c7', name: 'Harem' },
+  { id: '2d1f5d56-a1e5-4d0d-a961-2193588b08ec', name: 'Histórico' },
+  { id: 'a3c67850-4684-404e-9b7f-c69850ee5da6', name: 'Girls Love' },
+  { id: '423e2eae-a7a2-4a8b-ac03-a8351462d71d', name: 'Boys Love' },
+  { id: '9ab53f92-3eed-4e9b-903a-917c86035ee3', name: 'Isekai' },
+  { id: 'ace04997-f6bd-436e-b261-779182193d3d', name: 'Tragedia' },
+  { id: 'b29d6a3d-1569-4e7a-8cef-cf652e3b5b61', name: 'Wuxia' },
+  { id: '4485491f-2b5e-4c11-8fdf-1a35a04b77c9', name: 'Musical' },
+  { id: '5fff9cde-849c-4d78-aab0-0d52b2ee1d25', name: 'Crimen' },
 ]
 
 function toggleGenre(id) {
