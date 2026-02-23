@@ -108,6 +108,20 @@ onMounted(loadChapters)
 </script>
 
 <style scoped>
+
+@media (max-width: 768px) {
+  .reader-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .chapter-select {
+    width: 100%;
+  }
+  .reader-nav button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
 .reader {
   max-width: 800px;
   margin: 0 auto;

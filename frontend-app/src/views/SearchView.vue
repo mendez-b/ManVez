@@ -109,6 +109,19 @@ watch(() => route.query.q, (val) => {
 </script>
 
 <style scoped>
+
+@media (max-width: 768px) {
+  .search-input {
+    flex-direction: column;
+  }
+  .search-input input {
+    max-width: 100%;
+  }
+  .manga-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
 .search-page {
   max-width: 1200px;
   margin: 0 auto;

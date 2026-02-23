@@ -82,10 +82,21 @@ onMounted(async () => {
   display: inline-block;
 }
 
+
 .manga-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .manga-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .section-title {
+    font-size: 1.1rem;
+  }
 }
 
 .loading {

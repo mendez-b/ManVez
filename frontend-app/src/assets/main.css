@@ -43,3 +43,17 @@ a {
 img {
   max-width: 100%;
 }
+@media (max-width: 768px) {
+  .nav-container {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .search-bar {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
+  .nav-links {
+    gap: 12px;
+  }
+}
