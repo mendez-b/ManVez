@@ -33,28 +33,21 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import MangaCard from '../components/MangaCard.vue'
 
+const BASE = 'https://manvez-consumet.onrender.com/manga/mangadex'
 const popularMangas = ref([])
 const recentMangas = ref([])
 const loadingPopular = ref(true)
 const loadingRecent = ref(true)
 
-const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
-const INCLUDES = 'includes[]=cover_art'
-
 onMounted(async () => {
   try {
-    const popRes = await axios.get(
-      `${BASE}?path=/manga&query=limit=12%26order[followedCount]=desc%26includes[]=cover_art%26contentRating[]=safe`
-    )
-    popularMangas.value = popRes.data.data
+    const popRes = await axios.get(`${BASE}?page=1&perPage=12`)
+    popularMangas.value = popRes.data.results
     loadingPopular.value = false
 
-    const recRes = await axios.get(
-      `${BASE}?path=/manga&query=limit=12%26order[updatedAt]=desc%26includes[]=cover_art%26contentRating[]=safe`
-    )
-    recentMangas.value = recRes.data.data
+    const recRes = await axios.get(`${BASE}?page=2&perPage=12`)
+    recentMangas.value = recRes.data.results
     loadingRecent.value = false
-
   } catch (error) {
     console.error('Error al cargar mangas:', error)
     loadingPopular.value = false
