@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar">
     <div class="nav-container">
-      <RouterLink to="/" class="logo">📚 MangaReads</RouterLink>
+      <RouterLink to="/" class="logo"> MangaReads</RouterLink>
       
       <div class="nav-links">
         <RouterLink to="/">Home</RouterLink>
