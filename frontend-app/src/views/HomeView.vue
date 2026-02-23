@@ -3,7 +3,8 @@
     <!-- Sección: Populares hoy -->
     <section class="section">
       <h2 class="section-title">🔥 Populares hoy</h2>
-      <div v-if="loadingPopular" class="loading">Cargando...</div>
+      <div v-if="loadingPopular" class="manga-grid">
+  <SkeletonCard v-for="n in 12" :key="n" /></div>
       <div v-else class="manga-grid">
         <MangaCard 
           v-for="manga in popularMangas" 
@@ -16,7 +17,7 @@
     <!-- Sección: Últimas actualizaciones -->
     <section class="section">
       <h2 class="section-title">🕐 Últimas actualizaciones</h2>
-      <div v-if="loadingRecent" class="loading">Cargando...</div>
+      <div v-if="loadingRecent" class="manga-grid"><SkeletonCard v-for="n in 12" :key="n" /></div>
       <div v-else class="manga-grid">
         <MangaCard 
           v-for="manga in recentMangas" 
@@ -32,6 +33,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import MangaCard from '../components/MangaCard.vue'
+import SkeletonCard from '../components/SkeletonCard.vue'
 
 const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
 const INCLUDES = 'includes[]=cover_art'
