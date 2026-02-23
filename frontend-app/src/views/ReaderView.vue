@@ -10,6 +10,10 @@
     </div>
 
     <div v-if="loading" class="loading">Cargando capítulo...</div>
+    
+    <div v-else-if="pages.length === 0" class="empty">
+  😔 Este capítulo no está disponible. Prueba con otro capítulo.
+</div>
 
     <div v-else-if="chapters.length === 0" class="empty">
     Este manga no tiene capítulos disponibles en español o inglés.
