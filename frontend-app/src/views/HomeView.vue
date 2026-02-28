@@ -1,10 +1,14 @@
 <template>
   <div class="home">
+    <!-- Carrusel destacado -->
+    <HeroCarousel />
+
     <!-- Sección: Populares hoy -->
     <section class="section">
       <h2 class="section-title">🔥 Populares hoy</h2>
       <div v-if="loadingPopular" class="manga-grid">
-  <SkeletonCard v-for="n in 12" :key="n" /></div>
+        <SkeletonCard v-for="n in 5" :key="n" />
+      </div>
       <div v-else class="manga-grid">
         <MangaCard 
           v-for="manga in popularMangas" 
@@ -17,7 +21,9 @@
     <!-- Sección: Últimas actualizaciones -->
     <section class="section">
       <h2 class="section-title">🕐 Últimas actualizaciones</h2>
-      <div v-if="loadingRecent" class="manga-grid"><SkeletonCard v-for="n in 12" :key="n" /></div>
+      <div v-if="loadingRecent" class="manga-grid">
+        <SkeletonCard v-for="n in 30" :key="n" />
+      </div>
       <div v-else class="manga-grid">
         <MangaCard 
           v-for="manga in recentMangas" 
@@ -34,9 +40,9 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import MangaCard from '../components/MangaCard.vue'
 import SkeletonCard from '../components/SkeletonCard.vue'
+import HeroCarousel from '../components/HeroCarousel.vue'
 
 const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
-const INCLUDES = 'includes[]=cover_art'
 const popularMangas = ref([])
 const recentMangas = ref([])
 const loadingPopular = ref(true)
@@ -45,13 +51,13 @@ const loadingRecent = ref(true)
 onMounted(async () => {
   try {
     const popRes = await axios.get(
-      `${BASE}?path=/manga&query=limit=12%26order[followedCount]=desc%26includes[]=cover_art%26contentRating[]=safe`
+      `${BASE}?path=/manga&query=limit=5%26order[followedCount]=desc%26includes[]=cover_art%26contentRating[]=safe`
     )
     popularMangas.value = popRes.data.data
     loadingPopular.value = false
 
     const recRes = await axios.get(
-      `${BASE}?path=/manga&query=limit=12%26order[updatedAt]=desc%26includes[]=cover_art%26contentRating[]=safe`
+      `${BASE}?path=/manga&query=limit=30%26order[updatedAt]=desc%26includes[]=cover_art%26contentRating[]=safe`
     )
     recentMangas.value = recRes.data.data
     loadingRecent.value = false
@@ -82,10 +88,9 @@ onMounted(async () => {
   display: inline-block;
 }
 
-
 .manga-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
 }
 

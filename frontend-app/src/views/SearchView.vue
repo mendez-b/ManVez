@@ -2,24 +2,24 @@
   <div class="search-page">
     <div class="filters">
       <h2>Buscar Manga</h2>
-      
+
       <!-- Input de búsqueda -->
       <div class="search-input">
-        <input 
+        <input
           v-model="query"
-          @keyup.enter="search"
+          @keyup.enter="newSearch"
           placeholder="Nombre del manga..."
           type="text"
         />
-        <button @click="search">Buscar</button>
+        <button @click="newSearch">Buscar</button>
       </div>
 
       <!-- Filtro por géneros -->
       <div class="genre-filter">
         <h3>Géneros</h3>
         <div class="genre-tags">
-          <button 
-            v-for="genre in genres" 
+          <button
+            v-for="genre in genres"
             :key="genre.id"
             :class="['tag', { active: selectedGenres.includes(genre.id) }]"
             @click="toggleGenre(genre.id)"
@@ -31,16 +31,39 @@
     </div>
 
     <!-- Resultados -->
-    <div v-if="loading" class="loading">Buscando...</div>
+    <div v-if="loading" class="manga-grid">
+      <SkeletonCard v-for="n in 15" :key="n" />
+    </div>
     <div v-else-if="results.length === 0 && searched" class="empty">
       No se encontraron resultados.
     </div>
-    <div v-else class="manga-grid">
-      <MangaCard 
-        v-for="manga in results" 
-        :key="manga.id" 
-        :manga="manga" 
-      />
+    <div v-else-if="results.length > 0">
+      <div class="manga-grid">
+        <MangaCard
+          v-for="manga in results"
+          :key="manga.id"
+          :manga="manga"
+        />
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination">
+        <button
+          class="page-btn"
+          :disabled="offset === 0"
+          @click="changePage(-1)"
+        >
+          ← Anterior
+        </button>
+        <span class="page-info">Página {{ currentPage }}</span>
+        <button
+          class="page-btn"
+          :disabled="!hasMore"
+          @click="changePage(1)"
+        >
+          Siguiente →
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -50,18 +73,23 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import MangaCard from '../components/MangaCard.vue'
+import SkeletonCard from '../components/SkeletonCard.vue'
 
-const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
-const route = useRoute()
-const query = ref('')
-const results = ref([])
-const loading = ref(false)
-const searched = ref(false)
+const BASE    = 'https://manvez-backend.onrender.com/api/mangadex'
+const LIMIT   = 15
+const route   = useRoute()
+
+const query          = ref('')
+const results        = ref([])
+const loading        = ref(false)
+const searched       = ref(false)
 const selectedGenres = ref([])
+const offset         = ref(0)
+const hasMore        = ref(false)
+const currentPage    = ref(1)
 
-// Géneros más comunes de MangaDex (IDs reales)
 const genres = [
-    { id: '391b0423-d847-456f-aff0-8b0cfc03066b', name: 'Acción' },
+  { id: '391b0423-d847-456f-aff0-8b0cfc03066b', name: 'Acción' },
   { id: 'e5301a23-ebd9-49dd-a0cb-2add944c7fe9', name: 'Aventura' },
   { id: '4d32cc48-9f00-4cca-9b5a-a839f0764984', name: 'Comedia' },
   { id: 'b9af3a63-f058-46de-a9a0-e0c13906197a', name: 'Drama' },
@@ -93,16 +121,25 @@ function toggleGenre(id) {
   else selectedGenres.value.splice(idx, 1)
 }
 
+// Búsqueda nueva: resetea paginación
+function newSearch() {
+  offset.value = 0
+  currentPage.value = 1
+  search()
+}
+
 async function search() {
   loading.value = true
   searched.value = true
   try {
-    let queryParams = `limit=20%26includes[]=cover_art%26contentRating[]=safe`
-    if (query.value.trim()) queryParams += `%26title=${encodeURIComponent(query.value)}`
-    selectedGenres.value.forEach(g => { queryParams += `%26includedTags[]=${g}` })
-    
-    const res = await axios.get(`${BASE}?path=/manga&query=${queryParams}`)
+    let params = `limit=${LIMIT}%26offset=${offset.value}%26includes[]=cover_art%26contentRating[]=safe`
+    if (query.value.trim()) params += `%26title=${encodeURIComponent(query.value)}`
+    selectedGenres.value.forEach(g => { params += `%26includedTags[]=${g}` })
+
+    const res = await axios.get(`${BASE}?path=/manga&query=${params}`)
     results.value = res.data.data
+    // Si devuelve 15 resultados, asumimos que hay más
+    hasMore.value = res.data.data.length === LIMIT
   } catch (err) {
     console.error(err)
   } finally {
@@ -110,34 +147,28 @@ async function search() {
   }
 }
 
-// Si llegó desde la barra de búsqueda de la navbar
+function changePage(dir) {
+  offset.value += dir * LIMIT
+  currentPage.value += dir
+  search()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 onMounted(() => {
   if (route.query.q) {
     query.value = route.query.q
     search()
+  } else {
+    search() // Carga mangas por defecto
   }
 })
 
-// Si cambia el query de la URL
 watch(() => route.query.q, (val) => {
-  if (val) { query.value = val; search() }
+  if (val) { query.value = val; newSearch() }
 })
 </script>
 
 <style scoped>
-
-@media (max-width: 768px) {
-  .search-input {
-    flex-direction: column;
-  }
-  .search-input input {
-    max-width: 100%;
-  }
-  .manga-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-}
 .search-page {
   max-width: 1200px;
   margin: 0 auto;
@@ -216,15 +247,69 @@ watch(() => route.query.q, (val) => {
   border-color: var(--accent);
 }
 
+/* Grid fijo 5 columnas */
 .manga-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
+}
+
+/* Paginación */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.page-info {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.page-btn {
+  padding: 8px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .loading, .empty {
   text-align: center;
   padding: 60px;
   color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .search-input {
+    flex-direction: column;
+  }
+  .search-input input {
+    max-width: 100%;
+  }
+  .manga-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .pagination {
+    justify-content: center;
+  }
 }
 </style>
