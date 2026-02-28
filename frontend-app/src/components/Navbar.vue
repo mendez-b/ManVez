@@ -4,7 +4,7 @@
       <RouterLink to="/" class="logo"> MangaReads</RouterLink>
       
       <div class="nav-links">
-        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/">Inicio</RouterLink>
         <RouterLink to="/search">Buscar</RouterLink>
       </div>
 
