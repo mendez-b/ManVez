@@ -3,7 +3,7 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h2>MangaReads</h2>
+      <h2>LastKingscans</h2>
       <p>Bienvenido de nuevo</p>
       
       <form @submit.prevent="handleLogin">

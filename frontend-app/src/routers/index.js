@@ -12,7 +12,11 @@ const routes = [
   //AQUI SE REGISTRA LA RUTA PARA EL LOGIN
   { path: '/login', name: 'Login', component: () => import('../views/LoginView.vue') },
   //AQUI SE REGISTRA LA RUTA PARA EL REGISTRO DE USUARIOS
-  { path: '/register', name: 'Register', component: () => import('../views/RegisterView.vue') }
+  { path: '/register', name: 'Register', component: () => import('../views/RegisterView.vue') },
+  //AQUI SE REGISTRA LA RUTA PARA RECUPERAR CONTRASEÑA
+  {  path: '/forgot-password', name: 'ForgotPassword', component: () => import('../views/ForgotPasswordView.vue') }
+  //AQUI SE RESGITRA LA RUTA PARA QUE EL USUARIO PUEDA VER LA VISTA CUANDO DE CLICK EN SU CORREO
+  { path: '/reset-password', name: 'ResetPassword', component: () => import('../views/ResetPasswordView.vue') }
 ]
 
 const router = createRouter({
