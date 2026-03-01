@@ -1,5 +1,6 @@
+<?php
 //AQUI SE CREA EL CONTROLADOR DE AUTENTICACION PARA EL LOGIN
-<?php namespace App\Controllers;
+namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
 

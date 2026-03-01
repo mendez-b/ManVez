@@ -24,8 +24,8 @@
         {{ isDark ? '☀️' : '🌙' }}
       </button>
 
-      //aqui se agrega el boton para iniciar sesion, se muestra siempre, 
-      //pero en el futuro se puede cambiar para que solo se muestre cuando el usuario no este logueado
+      <!--aqui se agrega el boton para iniciar sesion, se muestra siempre, 
+      pero en el futuro se puede cambiar para que solo se muestre cuando el usuario no este logueado-->
       <div class="auth-section">
         <router-link to="/login">
           <button class="login-btn">Iniciar Sesión</button>
