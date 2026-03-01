@@ -9,6 +9,32 @@
       <button type="submit">Entrar</button>
     </form>
   </div>
+  <div class="login-page">
+    <div class="login-card">
+      <h2>MangaReads</h2>
+      <p>Bienvenido de nuevo</p>
+      
+      <form @submit.prevent="handleLogin">
+        <div class="input-group">
+          <label>Correo Electrónico</label>
+          <input v-model="email" type="email" placeholder="ejemplo@correo.com" required />
+        </div>
+        
+        <div class="input-group">
+          <label>Contraseña</label>
+          <input v-model="password" type="password" placeholder="••••••••" required />
+        </div>
+
+        <button type="submit" class="primary-btn">Entrar</button>
+      </form>
+
+      <div class="auth-options">
+        <router-link to="/forgot-password">¿Olvidaste tu contraseña?</router-link>
+        <hr />
+        <span>¿No tienes cuenta? <router-link to="/register">Regístrate aquí</router-link></span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -68,3 +94,68 @@ const handleLogin = async () => {
 
 //JSON.stringify(...): esta funcion convierte mi objeto en un string de texto JSON
 //el cual es el lenguage universal para que codelgniter y Vue puedan entenderse
+
+<style scoped>
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  color: white;
+}
+
+.login-card {
+  background: #1e293b; /* Un azul muy oscuro para combinar */
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.input-group {
+  text-align: left;
+  margin-bottom: 1.2rem;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: white;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2ecc71; /* El verde que usamos antes */
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.auth-options {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.auth-options a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+hr {
+  margin: 1rem 0;
+  border: 0;
+  border-top: 1px solid #334155;
+}
+
+</style>

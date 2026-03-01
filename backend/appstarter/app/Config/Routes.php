@@ -12,6 +12,8 @@ $routes->get('/covers/(:segment)/(:segment)', 'MangaProxy::cover/$1/$2');
 $routes->get('/', 'Home::index');
 //aqui se define la ruta para el login
 $routes->post('login', 'AuthController::login');
+//aqui se define la ruta para el registro de usuarios
+$routes->post('register', 'AuthController::register');
 
 //POST: este indica que la ruta recibira datos (el email y la clave) de forma segura
 

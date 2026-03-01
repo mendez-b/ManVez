@@ -9,8 +9,10 @@ const routes = [
   { path: '/', component: HomeView },
   { path: '/search', component: SearchView },
   { path: '/read/:mangaId/:chapterId', component: ReaderView },
-  //AQUI SE REGISTRA LA RUTA
-  { path: '/login', name: 'Login', component: () => import('../views/LoginView.vue') }
+  //AQUI SE REGISTRA LA RUTA PARA EL LOGIN
+  { path: '/login', name: 'Login', component: () => import('../views/LoginView.vue') },
+  //AQUI SE REGISTRA LA RUTA PARA EL REGISTRO DE USUARIOS
+  { path: '/register', name: 'Register', component: () => import('../views/RegisterView.vue') }
 ]
 
 const router = createRouter({
