@@ -1,8 +1,8 @@
-//AQUI SE CREA EL MODELO DE USUARIO
-
 <?php
 
 namespace App\Models;
+
+//AQUI SE CREA EL MODELO DE USUARIO
 
 use CodeIgniter\Model;
 

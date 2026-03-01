@@ -1,14 +1,6 @@
 
 // AQUI SE CREA LA VISTA DEL LOGIN
 <template>
-  <div class="login-container">
-    <form @submit.prevent="handleLogin">
-      <h2>Iniciar Sesión</h2>
-      <input v-model="email" type="email" placeholder="Correo" required />
-      <input v-model="password" type="password" placeholder="Contraseña" required />
-      <button type="submit">Entrar</button>
-    </form>
-  </div>
   <div class="login-page">
     <div class="login-card">
       <h2>MangaReads</h2>
