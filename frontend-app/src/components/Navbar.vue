@@ -23,6 +23,14 @@
       <button class="theme-btn" @click="toggleTheme">
         {{ isDark ? '☀️' : '🌙' }}
       </button>
+
+      //aqui se agrega el boton para iniciar sesion, se muestra siempre, 
+      //pero en el futuro se puede cambiar para que solo se muestre cuando el usuario no este logueado
+      <div class="auth-section">
+        <router-link to="/login">
+          <button class="login-btn">Iniciar Sesión</button>
+        </router-link>
+      </div>
     </div>
   </nav>
 </template>
@@ -122,5 +130,27 @@ function toggleTheme() {
   border-radius: 6px;
   cursor: pointer;
   font-size: 1.1rem;
+}
+
+/*ESTE ES EL ESTILO PARA EL LOGIN*/
+.nav-container {
+  display: flex;
+  justify-content: space-between; /* Esto empuja el login a la derecha */
+  align-items: center;
+  padding: 0 20px;
+}
+
+.login-btn {
+  background-color: #2ecc71; /* Un verde que resalte sobre el azul */
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.login-btn:hover {
+  background-color: #27ae60;
 }
 </style>

@@ -8,10 +8,28 @@ const routes = [
   { path: '/manga/:mangaId', component: DetailView },
   { path: '/', component: HomeView },
   { path: '/search', component: SearchView },
-  { path: '/read/:mangaId/:chapterId', component: ReaderView }
+  { path: '/read/:mangaId/:chapterId', component: ReaderView },
+  //AQUI SE REGISTRA LA RUTA
+  { path: '/login', name: 'Login', component: () => import('../views/LoginView.vue') }
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes
-})
+});
+
+//NAVIGATION GUARD: esto verificara si el usuario 
+//tiene un token antes de dejarlo entrar a ciertas paginas
+
+router.beforeEach((to, from, next) => {
+  const publicPages = ['/login', '/'];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem('user_token');
+
+  if (authRequired && !loggedIn) {
+    return next('/login');
+  }
+  next();
+});
+
+export default router;

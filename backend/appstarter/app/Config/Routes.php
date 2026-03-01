@@ -10,3 +10,13 @@ $routes->get('/api/mangadex', 'MangaProxy::api');
 $routes->get('/covers/(:segment)/(:segment)', 'MangaProxy::cover/$1/$2');
 
 $routes->get('/', 'Home::index');
+//aqui se define la ruta para el login
+$routes->post('login', 'AuthController::login');
+
+//POST: este indica que la ruta recibira datos (el email y la clave) de forma segura
+
+//'login': esta sera la URL, si el servidor corre en el puerto 8080, 
+//la URL completa para hacer login seria http://localhost:8080/login
+
+//'AuthController::login': le dice a codelgniter que cuando alguien entre a /login,
+//debe ejecutar el metodo "login" que esta dentro del controlador "AuthController.php"
