@@ -54,6 +54,8 @@ const handleLogin = async () => {
       const data = await response.json();
       // Guarda el token de sesión para que el router lo reconozca
       localStorage.setItem('user_token', data.token); 
+      // disparar un evento global para que otros componentes (Navbar) se actualicen
+      window.dispatchEvent(new Event('user-login'));
       // Redirige al home tras el éxito
       router.push('/'); 
     } else {

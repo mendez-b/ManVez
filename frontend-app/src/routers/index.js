@@ -16,7 +16,8 @@ const routes = [
   //AQUI SE REGISTRA LA RUTA PARA RECUPERAR CONTRASEÑA
   {  path: '/forgot-password', name: 'ForgotPassword', component: () => import('../views/ForgotPasswordView.vue') },
   //AQUI SE RESGITRA LA RUTA PARA QUE EL USUARIO PUEDA VER LA VISTA CUANDO DE CLICK EN SU CORREO
-  { path: '/reset-password', name: 'ResetPassword', component: () => import('../views/ResetPasswordView.vue') }
+  { path: '/reset-password', name: 'ResetPassword', component: () => import('../views/ResetPasswordView.vue') },
+  { path: '/favorites', name: 'Favorites', component: () => import('../views/FavoritesView.vue') }
 ]
 
 const router = createRouter({

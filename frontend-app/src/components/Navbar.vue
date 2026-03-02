@@ -25,9 +25,22 @@
       </button>
 
       <div class="auth-section">
-        <router-link to="/login">
-          <button class="login-btn">Iniciar Sesión</button>
-        </router-link>
+        <!-- si el usuario no está autentificado mostramos el botón de login -->
+        <template v-if="!isAuthenticated">
+          <router-link to="/login">
+            <button class="login-btn">Iniciar Sesión</button>
+          </router-link>
+        </template>
+        <!-- si está logueado mostramos el icono/perfil y un menú desplegable -->
+        <template v-else>
+          <div class="profile-dropdown">
+            <button class="profile-btn" @click="toggleMenu">👤</button>
+            <div class="dropdown" v-if="menuOpen">
+              <router-link to="/favorites" class="dropdown-item">Favoritos</router-link>
+              <a href="#" class="dropdown-item" @click.prevent="logout">Cerrar sesión</a>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </nav>
@@ -40,6 +53,48 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const searchQuery = ref('')
 const isDark = ref(true)
+
+// estado de autenticación leyendo el token del localStorage
+const isAuthenticated = ref(!!localStorage.getItem('user_token'))
+const menuOpen = ref(false)
+
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value
+}
+
+function logout() {
+  localStorage.removeItem('user_token')
+  isAuthenticated.value = false
+  menuOpen.value = false
+  router.push('/login')
+}
+
+// el token puede cambiar en otra pestaña o después de un login, así que
+// escuchamos el evento de storage para actualizar el estado
+window.addEventListener('storage', () => {
+  isAuthenticated.value = !!localStorage.getItem('user_token')
+})
+// evento que disparamos manualmente al iniciar sesión (no se dispara storage en la misma pestaña)
+window.addEventListener('user-login', () => {
+  isAuthenticated.value = true
+})
+
+// cerrar menú al hacer clic fuera
+import { onMounted, onBeforeUnmount } from 'vue'
+
+function handleDocumentClick(e) {
+  if (!e.target.closest('.profile-dropdown')) {
+    menuOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleDocumentClick)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleDocumentClick)
+})
 
 function goToSearch() {
   if (searchQuery.value.trim()) {
@@ -147,5 +202,42 @@ function toggleTheme() {
 
 .login-btn:hover {
   background-color: #27ae60;
+}
+
+/* estilos del perfil y menú */
+.profile-dropdown {
+  position: relative;
+}
+
+.profile-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 110%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  z-index: 200;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  color: var(--text-primary);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-secondary);
 }
 </style>
