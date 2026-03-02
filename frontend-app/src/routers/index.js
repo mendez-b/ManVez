@@ -28,7 +28,8 @@ const router = createRouter({
 //tiene un token antes de dejarlo entrar a ciertas paginas
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/', '/register', '/forgot-password', '/reset-password'];
+  // Hacer pública la página de inicio y las páginas de autenticación; el resto requiere sesión
+  const publicPages = ['/', '/login', '/register', '/forgot-password', '/reset-password'];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user_token');
 

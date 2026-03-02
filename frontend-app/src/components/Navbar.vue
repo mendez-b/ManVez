@@ -2,7 +2,7 @@
   <nav class="navbar">
     <div class="nav-container">
       <RouterLink to="/" class="logo"> lastKingscans</RouterLink>
-      
+
       <div class="nav-links">
         <RouterLink to="/">Inicio</RouterLink>
         <RouterLink to="/search">Mangas</RouterLink>
@@ -10,10 +10,10 @@
 
       <!-- Barra de búsqueda rápida -->
       <div class="search-bar">
-        <input 
+        <input
           v-model="searchQuery"
           @keyup.enter="goToSearch"
-          placeholder="Buscar manga..." 
+          placeholder="Buscar manga..."
           type="text"
         />
         <button @click="goToSearch">🔍</button>
@@ -24,8 +24,6 @@
         {{ isDark ? '☀️' : '🌙' }}
       </button>
 
-      <!--aqui se agrega el boton para iniciar sesion, se muestra siempre, 
-      pero en el futuro se puede cambiar para que solo se muestre cuando el usuario no este logueado-->
       <div class="auth-section">
         <router-link to="/login">
           <button class="login-btn">Iniciar Sesión</button>
@@ -52,10 +50,7 @@ function goToSearch() {
 
 function toggleTheme() {
   isDark.value = !isDark.value
-  document.documentElement.setAttribute(
-    'data-theme', 
-    isDark.value ? 'dark' : 'light'
-  )
+  document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
 }
 </script>
 
