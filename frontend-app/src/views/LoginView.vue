@@ -33,6 +33,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const email = ref('');
 const password = ref('');
 const router = useRouter();
@@ -40,7 +41,7 @@ const router = useRouter();
 const handleLogin = async () => {
   try {
     // Aquí llamas a tu API de CodeIgniter
-    const response = await fetch('http://localhost:8080/login', {
+    const response = await fetch(`${API}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
