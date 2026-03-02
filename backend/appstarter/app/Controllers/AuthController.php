@@ -172,6 +172,11 @@ class AuthController extends ResourceController {
             return $this->response->setStatusCode(400)->setJSON(['error' => 'Email inválido']);
         }
 
+        // Normalize email
+        $email = trim($email);
+        $email = strtolower($email);
+        @file_put_contents(WRITEPATH . 'logs/forgot_raw.log', date('c') . " - normalized email: " . $email . PHP_EOL, FILE_APPEND);
+
         try {
             $userModel = new \App\Models\UserModel();
             $user = $userModel->where('email', $email)->first();
@@ -181,7 +186,9 @@ class AuthController extends ResourceController {
         }
 
         if (!$user) {
-            return $this->response->setStatusCode(404)->setJSON(['error' => 'Correo no encontrado']);
+            // No revelar existencia de la cuenta: registrar el intento y continuar
+            service('logger')->warning('forgotPassword: requested email not found: ' . $email);
+            // Nota: continuamos y enviaremos igualmente el correo de recuperación para no filtrar cuentas
         }
 
         // 1. Generar un token único
@@ -201,10 +208,52 @@ class AuthController extends ResourceController {
             'created_at' => date('Y-m-d H:i:s')
         ]);
 
-        // 3. Enviar el correo (en desarrollo evitamos llamar al proveedor real)
-        // Resend client not available in this environment; return simulated response
-        service('logger')->warning('Resend client skipped; returning simulated response');
-        return $this->response->setJSON(['message' => 'Correo de recuperación (simulado)']);
+        // 3. Enviar el correo via Resend API
+        $apiKey = getenv('RESEND_API_KEY') ?: env('resend.apiKey');
+        if (empty($apiKey)) {
+            service('logger')->error('forgotPassword: Resend API key not configured');
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'Email provider not configured']);
+        }
+
+        $resetUrl = 'https://man-vez.vercel.app/reset-password?token=' . $token;
+        $html = "<p>Hola,</p><p>Recibimos una solicitud para reestablecer tu contraseña. Pulsa el enlace para continuar:</p><p><a href=\"$resetUrl\">$resetUrl</a></p><p>Si no solicitaste este correo, ignóralo.</p>";
+
+        $payload = json_encode([
+            'from' => 'no-reply@man-vez.vercel.app',
+            'to' => [$email],
+            'subject' => 'Recuperar contraseña - ManVez',
+            'html' => $html
+        ]);
+
+        try {
+            $ch = curl_init('https://api.resend.com/emails');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            // In some local environments cURL may fail SSL verification due to missing CA bundle.
+            // For development allow disabling verification (not recommended for production).
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $apiKey,
+            ]);
+
+            $resp = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr = curl_error($ch);
+            curl_close($ch);
+
+            if ($resp === false || $httpCode >= 400) {
+                service('logger')->error('forgotPassword: Resend send failed: ' . $curlErr . ' resp=' . $resp);
+                return $this->response->setStatusCode(500)->setJSON(['error' => 'Error enviando correo']);
+            }
+
+            return $this->response->setJSON(['message' => 'Correo de recuperación enviado']);
+        } catch (\Throwable $e) {
+            service('logger')->error('forgotPassword exception sending email: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'Error enviando correo']);
+        }
     }
 
     //este metodo actualizara la contraseña y si todo es valido actualizara al usuario en la base de datos
