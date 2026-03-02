@@ -25,4 +25,8 @@ class CreatePasswordResetsTable extends Migration
         // No usamos ID autoincremental aquí, el token es nuestra clave de búsqueda
         $this->forge->createTable('password_resets');
     }
+    public function down()
+    {
+        $this->forge->dropTable('password_resets', true);
+    }
 }

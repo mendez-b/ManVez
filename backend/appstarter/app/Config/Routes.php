@@ -14,6 +14,14 @@ $routes->get('/', 'Home::index');
 $routes->post('login', 'AuthController::login');
 //aqui se define la ruta para el registro de usuarios
 $routes->post('register', 'AuthController::register');
+//aqui se define la ruta para el reseteo de contraseña
+$routes->post('forgot-password', 'AuthController::forgotPassword');
+
+// Responder peticiones preflight (OPTIONS) para cualquier ruta
+$routes->options('(:any)', static function () {
+	$res = service('response');
+	return $res->setStatusCode(200);
+});
 
 //POST: este indica que la ruta recibira datos (el email y la clave) de forma segura
 

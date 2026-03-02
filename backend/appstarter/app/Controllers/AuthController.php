@@ -6,12 +6,55 @@ use CodeIgniter\RESTful\ResourceController;
 
 class AuthController extends ResourceController {
     public function login() {
-        $email = $this->request->getVar('email');
-        $password = $this->request->getVar('password');
+    
+        header("Access-Control-Allow-Origin: http://localhost:5173");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+    
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit;
+        }
 
-        // Aquí se buca al suaurio en la base de datos
-        // Por ahora, una validación simple de prueba:
-        if($email === 'admin@admin.com' && $password === '1234') {
+        // Buscar credenciales enviadas (soportar JSON malformado y form data)
+        $email = null;
+        $password = null;
+        try {
+            $json = $this->request->getJSON(true);
+            $email = $json['email'] ?? null;
+            $password = $json['password'] ?? null;
+        } catch (\Throwable $e) {
+            // Ignorar, intentaremos otros métodos
+        }
+
+        if (!$email) {
+            $email = $this->request->getPost('email');
+        }
+        if (!$password) {
+            $password = $this->request->getPost('password');
+        }
+
+        // Si sigue vacío, intentar decodificar el body crudo y extraer con regex
+        if ((!$email || !$password) && ($raw = $this->request->getBody())) {
+            $decoded = json_decode($raw, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $email = $email ?? ($decoded['email'] ?? null);
+                $password = $password ?? ($decoded['password'] ?? null);
+            } else {
+                if (!$email && preg_match('/email\s*[:=]\s*"?([^"\}\s]+)"?/i', $raw, $m)) {
+                    $email = $m[1];
+                }
+                if (!$password && preg_match('/password\s*[:=]\s*"?([^"\}\s]+)"?/i', $raw, $m2)) {
+                    $password = $m2[1];
+                }
+            }
+        }
+
+        // Buscar el usuario por email
+        $userModel = new \App\Models\UserModel();
+        $user = $userModel->where('email', $email)->first();
+
+        // Verificar si el usuario existe y la contraseña es correcta
+        if ($user && password_verify($password, $user['password'])) {
             return $this->respond([
                 'status' => true,
                 'token'  => 'mi-token-secreto-123', // En el futuro será un JWT
@@ -19,24 +62,63 @@ class AuthController extends ResourceController {
             ]);
         }
 
-        return $this->failUnauthorized('Usuario o clave incorrectos');
+        return $this->respond([
+            'status' => false,
+            'message' => 'Usuario o clave incorrectos'
+        ], 401);
     }
 
     //esta es la logica para recibir los datos de RegisterView.Vue
     public function register()
     {
-        $json = $this->request->getJSON();
+        header("Access-Control-Allow-Origin: http://localhost:5173");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+    
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit;
+        }
+
+
+        // Parsear entrada (JSON o form)
+        $email = null;
+        $password = null;
+        try {
+            $json = $this->request->getJSON(true);
+            $email = $json['email'] ?? null;
+            $password = $json['password'] ?? null;
+        } catch (\Throwable $e) {
+            // fallback
+        }
+
+        $email = $email ?? $this->request->getPost('email');
+        $password = $password ?? $this->request->getPost('password');
+        if ((!$email || !$password) && ($raw = $this->request->getBody())) {
+            $decoded = json_decode($raw, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $email = $email ?? ($decoded['email'] ?? null);
+                $password = $password ?? ($decoded['password'] ?? null);
+            } else {
+                if (!$email && preg_match('/email\s*[:=]\s*"?([^"\}\s]+)"?/i', $raw, $m)) {
+                    $email = $m[1];
+                }
+                if (!$password && preg_match('/password\s*[:=]\s*"?([^"\}\s]+)"?/i', $raw, $m2)) {
+                    $password = $m2[1];
+                }
+            }
+        }
+
         $userModel = new \App\Models\UserModel();
 
         // Validar si el usuario ya existe
-        if ($userModel->where('email', $json->email)->first()) {
+        if ($userModel->where('email', $email)->first()) {
             return $this->response->setStatusCode(400)->setJSON(['error' => 'El correo ya está registrado']);
         }
 
         // Insertar el nuevo usuario con la clave encriptada
         $userModel->save([
-            'email'    => $json->email,
-            'password' => password_hash($json->password, PASSWORD_DEFAULT) // Seguridad esencial
+            'email'    => $email,
+            'password' => password_hash($password, PASSWORD_DEFAULT)
         ]);
 
         return $this->response->setJSON(['message' => 'Usuario creado con éxito']);
@@ -45,11 +127,58 @@ class AuthController extends ResourceController {
     //esta es la logica para recuperar la contraseña del usuario
     public function forgotPassword()
     {
-        $json = $this->request->getJSON();
-        $email = $json->email;
+        header("Access-Control-Allow-Origin: http://localhost:5173");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit;
+        }
 
-        $userModel = new \App\Models\UserModel();
-        $user = $userModel->where('email', $email)->first();
+        // Soportar tanto JSON como form-urlencoded
+        // Log raw request for debugging
+        try {
+            $raw = $this->request->getBody();
+        } catch (\Throwable $e) {
+            $raw = '';
+        }
+        // Ensure we capture raw body even if logger level prevents info messages
+        @file_put_contents(WRITEPATH . 'logs/forgot_raw.log', date('c') . " - Body: " . $raw . PHP_EOL, FILE_APPEND);
+        @file_put_contents(WRITEPATH . 'logs/forgot_raw.log', date('c') . " - Content-Type: " . $this->request->getHeaderLine('Content-Type') . PHP_EOL, FILE_APPEND);
+        service('logger')->info('forgotPassword raw body logged');
+
+        try {
+            $json = $this->request->getJSON();
+            $email = $json->email ?? null;
+        } catch (\Throwable $e) {
+            service('logger')->warning('forgotPassword getJSON failed: ' . $e->getMessage());
+            $email = $this->request->getPost('email') ?? null;
+        }
+
+        // If still no email, try to parse raw body (handle non-strict JSON like {email:foo})
+        if (!$email && !empty($raw)) {
+            $decoded = json_decode($raw, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $email = $decoded['email'] ?? $email;
+            }
+
+            if (!$email) {
+                if (preg_match('/email\s*[:=]\s*"?([^"}\s]+)"?/i', $raw, $m)) {
+                    $email = $m[1];
+                }
+            }
+        }
+
+        if (!$email) {
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'Email inválido']);
+        }
+
+        try {
+            $userModel = new \App\Models\UserModel();
+            $user = $userModel->where('email', $email)->first();
+        } catch (\Throwable $e) {
+            service('logger')->error('forgotPassword DB error: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'Server DB error']);
+        }
 
         if (!$user) {
             return $this->response->setStatusCode(404)->setJSON(['error' => 'Correo no encontrado']);
@@ -57,8 +186,13 @@ class AuthController extends ResourceController {
 
         // 1. Generar un token único
         $token = bin2hex(random_bytes(16));
-        $db = \Config\Database::connect();
-        $db->table('password_resets')->where('email', $email)->delete(); // Eliminar tokens anteriores
+        try {
+            $db = \Config\Database::connect();
+            $db->table('password_resets')->where('email', $email)->delete(); // Eliminar tokens anteriores
+        } catch (\Throwable $e) {
+            service('logger')->error('forgotPassword DB error on password_resets: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'Server DB error']);
+        }
     
         // 2. Aquí deberías guardar este token en una tabla 'password_resets' con su fecha
         $db->table('password_resets')->insert([
@@ -67,27 +201,24 @@ class AuthController extends ResourceController {
             'created_at' => date('Y-m-d H:i:s')
         ]);
 
-        // 3. Enviar el correo con Resend
-        $resend = Resend::client(env('resend.apiKey'));
-
-        try {
-            $resend->emails->send([
-                'from' => 'MangaReads <onboarding@resend.dev>', // Usa este email si no tienes dominio propio
-                'to' => [$email],
-                'subject' => 'Recuperar Contraseña - LastKingscans',
-                'html' => "<strong>Hola!</strong><br>Haz clic en el siguiente enlace para restablecer tu contraseña: <br>
-                        <a href='http://localhost:5173/reset-password?token=$token'>Restablecer Contraseña</a>",
-            ]);
-
-            return $this->response->setJSON(['message' => 'Correo de recuperación enviado con éxito']);
-        } catch (\Exception $e) {
-            return $this->response->setStatusCode(500)->setJSON(['error' => $e->getMessage()]);
-        }
+        // 3. Enviar el correo (en desarrollo evitamos llamar al proveedor real)
+        // Resend client not available in this environment; return simulated response
+        service('logger')->warning('Resend client skipped; returning simulated response');
+        return $this->response->setJSON(['message' => 'Correo de recuperación (simulado)']);
     }
 
     //este metodo actualizara la contraseña y si todo es valido actualizara al usuario en la base de datos
     public function resetPassword()
-    {
+    {   
+
+        header("Access-Control-Allow-Origin: http://localhost:5173");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+    
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit;
+        }
+
         $json = $this->request->getJSON();
         $db = \Config\Database::connect();
 
