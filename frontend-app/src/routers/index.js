@@ -29,9 +29,14 @@ const router = createRouter({
 //tiene un token antes de dejarlo entrar a ciertas paginas
 
 router.beforeEach((to, from, next) => {
-  // Hacer pública la página de inicio y las páginas de autenticación; el resto requiere sesión
+  // Hacer pública la página de inicio, las páginas de autenticación y las de visualización de mangas
   const publicPages = ['/', '/login', '/register', '/forgot-password', '/reset-password'];
-  const authRequired = !publicPages.includes(to.path);
+  const isPublicPath = publicPages.includes(to.path) || 
+                       to.path.startsWith('/manga/') ||
+                       to.path.startsWith('/search') ||
+                       to.path.startsWith('/read/');
+  
+  const authRequired = !isPublicPath;
   const loggedIn = localStorage.getItem('user_token');
 
   if (authRequired && !loggedIn) {
