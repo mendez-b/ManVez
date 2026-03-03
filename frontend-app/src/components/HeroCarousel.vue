@@ -75,7 +75,10 @@ const COVERS = 'https://manvez-backend.onrender.com/covers'
 const mangas  = ref([])
 const loading = ref(true)
 const current = ref(0)
+const isMobile = ref(window.innerWidth <= 600)
 let timer = null
+
+function onResize() { isMobile.value = window.innerWidth <= 600 }
 
 async function load() {
   try {
@@ -106,7 +109,8 @@ function goTo(i)  { current.value = i }
 function getTitle(m) {
   const t = m.attributes?.title
   const raw = t?.en || t?.['ja-ro'] || Object.values(t || {})[0] || 'Sin título'
-  return raw.length > 40 ? raw.slice(0, 40) + '…' : raw
+  const limit = isMobile.value ? 18 : 40
+  return raw.length > limit ? raw.slice(0, limit) + '…' : raw
 }
 
 function getCover(m) {
@@ -148,8 +152,8 @@ function getType(m) {
   return 'MANGA'
 }
 
-onMounted(load)
-onUnmounted(pause)
+onMounted(() => { load(); window.addEventListener('resize', onResize) })
+onUnmounted(() => { pause(); window.removeEventListener('resize', onResize) })
 </script>
 
 <style scoped>
@@ -383,14 +387,88 @@ onUnmounted(pause)
   100% { background-position: -200% 0; }
 }
 
-/* ── Responsive ─────────────────────────────────────────────── */
+/* ── Responsive móvil ───────────────────────────────────────── */
 @media (max-width: 600px) {
-  .carousel { height: 200px; }
-  .slide-cover { height: 150px; }
-  .slide-title { font-size: 1rem; }
-  .slide-summary { display: none; }
-  .slide-genres { display: none; }
-  .slide-btn { display: none; }
-  .arrow { display: none; }
+  .carousel {
+    height: 180px;
+    border-radius: 8px;
+  }
+
+  .carousel-track {
+    height: 180px;
+  }
+
+  .carousel-slide {
+    height: 180px;
+    overflow: hidden;
+  }
+
+  .slide-overlay {
+    background: linear-gradient(
+      90deg,
+      rgba(0,0,0,0.88) 0%,
+      rgba(0,0,0,0.60) 60%,
+      rgba(0,0,0,0.20) 100%
+    );
+  }
+
+  .slide-content {
+    padding: 12px 14px;
+    gap: 10px;
+    align-items: center;
+    height: 180px;
+  }
+
+  .slide-left {
+    flex: 1;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+
+  .slide-title {
+    font-size: 0.88rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .slide-genres {
+    display: none;
+  }
+
+  .slide-summary-label,
+  .slide-summary {
+    display: none;
+  }
+
+  .slide-status {
+    font-size: 0.72rem;
+  }
+
+  .slide-cover-link {
+    flex-shrink: 0;
+  }
+
+  .slide-cover {
+    height: 140px;
+    width: auto;
+    max-width: 95px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+
+  .dots {
+    bottom: 6px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+  }
 }
 </style>

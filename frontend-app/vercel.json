@@ -1,9 +1,12 @@
 {
   "rewrites": [
-    { "source": "/api/mangadex/:path*", "destination": "https://api.mangadex.org/:path*" }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "\\/(.*)", "dest": "/index.html" }
+    { 
+      "source": "/api/mangadex/:path*", 
+      "destination": "https://api.mangadex.org/:path*" 
+    },
+    { 
+      "source": "/(.*)", 
+      "destination": "/index.html" 
+    }
   ]
 }
