@@ -1,6 +1,7 @@
 <template>
   <Navbar />
   <RouterView />
+  <AuthModal />
   <button 
     v-show="showScrollBtn" 
     @click="scrollToTop" 
@@ -14,6 +15,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import Navbar from './components/Navbar.vue'
+import AuthModal from './components/AuthModal.vue'
 
 const showScrollBtn = ref(false)
 
@@ -61,4 +63,3 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
   }
 }
 </style>
-```
