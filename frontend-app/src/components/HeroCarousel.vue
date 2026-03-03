@@ -390,31 +390,48 @@ onUnmounted(() => { pause(); window.removeEventListener('resize', onResize) })
 /* ── Responsive móvil ───────────────────────────────────────── */
 @media (max-width: 600px) {
   .carousel {
-    height: 220px;
+    height: 180px;
+    border-radius: 8px;
   }
 
-  .slide-content {
-    padding: 14px 16px;
-    gap: 12px;
-    align-items: flex-end;
-    /* Gradiente desde abajo para que el texto sea legible */
+  .carousel-track {
+    height: 180px;
+  }
+
+  .carousel-slide {
+    height: 180px;
+    overflow: hidden;
   }
 
   .slide-overlay {
     background: linear-gradient(
-      0deg,
-      rgba(0,0,0,0.92) 0%,
-      rgba(0,0,0,0.5) 50%,
-      rgba(0,0,0,0.1) 100%
+      90deg,
+      rgba(0,0,0,0.88) 0%,
+      rgba(0,0,0,0.60) 60%,
+      rgba(0,0,0,0.20) 100%
     );
   }
 
+  .slide-content {
+    padding: 12px 14px;
+    gap: 10px;
+    align-items: center;
+    height: 180px;
+  }
+
   .slide-left {
-    gap: 3px;
+    flex: 1;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
   }
 
   .slide-title {
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -433,10 +450,16 @@ onUnmounted(() => { pause(); window.removeEventListener('resize', onResize) })
     font-size: 0.72rem;
   }
 
-  /* Portada más pequeña en móvil */
+  .slide-cover-link {
+    flex-shrink: 0;
+  }
+
   .slide-cover {
-    height: 130px;
+    height: 140px;
     width: auto;
+    max-width: 95px;
+    object-fit: cover;
+    border-radius: 5px;
   }
 
   .dots {
