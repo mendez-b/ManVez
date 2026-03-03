@@ -75,7 +75,10 @@ const COVERS = 'https://manvez-backend.onrender.com/covers'
 const mangas  = ref([])
 const loading = ref(true)
 const current = ref(0)
+const isMobile = ref(window.innerWidth <= 600)
 let timer = null
+
+function onResize() { isMobile.value = window.innerWidth <= 600 }
 
 async function load() {
   try {
@@ -106,7 +109,8 @@ function goTo(i)  { current.value = i }
 function getTitle(m) {
   const t = m.attributes?.title
   const raw = t?.en || t?.['ja-ro'] || Object.values(t || {})[0] || 'Sin título'
-  return raw.length > 40 ? raw.slice(0, 40) + '…' : raw
+  const limit = isMobile.value ? 18 : 40
+  return raw.length > limit ? raw.slice(0, limit) + '…' : raw
 }
 
 function getCover(m) {
@@ -148,8 +152,8 @@ function getType(m) {
   return 'MANGA'
 }
 
-onMounted(load)
-onUnmounted(pause)
+onMounted(() => { load(); window.addEventListener('resize', onResize) })
+onUnmounted(() => { pause(); window.removeEventListener('resize', onResize) })
 </script>
 
 <style scoped>
@@ -383,14 +387,65 @@ onUnmounted(pause)
   100% { background-position: -200% 0; }
 }
 
-/* ── Responsive ─────────────────────────────────────────────── */
+/* ── Responsive móvil ───────────────────────────────────────── */
 @media (max-width: 600px) {
-  .carousel { height: 200px; }
-  .slide-cover { height: 150px; }
-  .slide-title { font-size: 1rem; }
-  .slide-summary { display: none; }
-  .slide-genres { display: none; }
-  .slide-btn { display: none; }
-  .arrow { display: none; }
+  .carousel {
+    height: 220px;
+  }
+
+  .slide-content {
+    padding: 14px 16px;
+    gap: 12px;
+    align-items: flex-end;
+    /* Gradiente desde abajo para que el texto sea legible */
+  }
+
+  .slide-overlay {
+    background: linear-gradient(
+      0deg,
+      rgba(0,0,0,0.92) 0%,
+      rgba(0,0,0,0.5) 50%,
+      rgba(0,0,0,0.1) 100%
+    );
+  }
+
+  .slide-left {
+    gap: 3px;
+  }
+
+  .slide-title {
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .slide-genres {
+    display: none;
+  }
+
+  .slide-summary-label,
+  .slide-summary {
+    display: none;
+  }
+
+  .slide-status {
+    font-size: 0.72rem;
+  }
+
+  /* Portada más pequeña en móvil */
+  .slide-cover {
+    height: 130px;
+    width: auto;
+  }
+
+  .dots {
+    bottom: 6px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+  }
 }
 </style>
