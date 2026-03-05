@@ -56,7 +56,7 @@
       </button>
 
       <!-- Botón hamburguesa (solo móvil) -->
-      <button class="hamburger" @click="openMenu">
+      <button class="hamburger" :class="{ 'hamburger--hidden': searchOpen }" @click="openMenu">
         <Menu :size="22" />
       </button>
     </div>
@@ -130,11 +130,6 @@ function goToSearch() {
     searchQuery.value = ''
     searchOpen.value = false
   }
-}
-
-function toggleTheme() {
-  isDark.value = !isDark.value
-  document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
 }
 
 function handleLogout() {
@@ -452,6 +447,10 @@ onMounted(() => {
 
   .hamburger {
     display: flex;
+  }
+
+  .hamburger--hidden {
+    display: none !important;
   }
 }
 </style>
