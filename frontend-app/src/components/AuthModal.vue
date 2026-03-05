@@ -4,7 +4,9 @@
       <div v-if="visible" class="modal-backdrop" @click.self="close">
         <div class="modal-box">
           <!-- Icono -->
-          <div class="modal-icon">📚</div>
+          <div class="modal-icon">
+           <img src="/logo.svg" alt="LastKing" class="modal-logo" />
+          </div>
 
           <!-- Texto -->
           <h2 class="modal-title">¡Bienvenido a LastKingScans!</h2>
@@ -83,6 +85,13 @@ onMounted(() => {
 .modal-icon {
   font-size: 2.4rem;
   margin-bottom: 12px;
+}
+
+.modal-logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
 /* ── Título ─────────────────────────────────────────────────── */
@@ -198,4 +207,5 @@ onMounted(() => {
     text-align: center;
   }
 }
+
 </style>
