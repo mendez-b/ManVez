@@ -115,21 +115,47 @@ class AuthController extends ResourceController {
             }
         }
 
-        $userModel = new \App\Models\UserModel();
+        // Obtener conexión a BD
+        $db = \Config\Database::connect();
+        $db->logQueries = true;
 
         // Validar si el usuario ya existe
-        if ($userModel->where('email', $email)->first()) {
+        $existingUser = $db->table('users')->where('email', $email)->get()->getRow();
+        if ($existingUser) {
             return $this->response->setStatusCode(400)->setJSON(['error' => 'El correo ya está registrado']);
         }
 
-        // Insertar el nuevo usuario con la clave encriptada
-        $userModel->save([
-            'username' => $username,
-            'email'    => $email,
-            'password' => password_hash($password, PASSWORD_DEFAULT)
-        ]);
+        try {
+            // Log para debug
+            error_log("Intentando registrar usuario: " . $email);
+            error_log("DB Platform: " . $db->getPlatform());
+            
+            // Insertar el nuevo usuario directamente con query
+            $result = $db->table('users')->insert([
+                'username' => $username,
+                'email'    => $email,
+                'password' => password_hash($password, PASSWORD_DEFAULT),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
-        return $this->response->setJSON(['message' => 'Usuario creado con éxito']);
+            error_log("Resultado insert: " . ($result ? "true" : "false"));
+            error_log("Error de BD: " . ($db->error()['message'] ?? 'none'));
+            
+            // Log queries
+            if (method_exists($db, 'getLastQuery')) {
+                error_log("Last Query: " . $db->getLastQuery());
+            }
+
+            if (!$result) {
+                return $this->response->setStatusCode(500)->setJSON(['error' => 'Error al insertar en la BD', 'debug' => $db->error()]);
+            }
+
+            return $this->response->setJSON(['message' => 'Usuario creado con éxito']);
+        } catch (\Exception $e) {
+            error_log("Exception: " . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON(['error' => $e->getMessage()]);
+        }
     }
 
     //esta es la logica para recuperar la contraseña del usuario
