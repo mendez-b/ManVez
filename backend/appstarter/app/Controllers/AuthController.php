@@ -58,7 +58,12 @@ class AuthController extends ResourceController {
             return $this->respond([
                 'status' => true,
                 'token'  => 'mi-token-secreto-123', // En el futuro será un JWT
-                'message' => '¡Bienvenido!'
+                'message' => '¡Bienvenido!',
+                'user' => [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email']
+                ]
             ]);
         }
 
@@ -83,10 +88,12 @@ class AuthController extends ResourceController {
         // Parsear entrada (JSON o form)
         $email = null;
         $password = null;
+        $username = null;
         try {
             $json = $this->request->getJSON(true);
             $email = $json['email'] ?? null;
             $password = $json['password'] ?? null;
+            $username = $json['username'] ?? null;
         } catch (\Throwable $e) {
             // fallback
         }
@@ -117,6 +124,7 @@ class AuthController extends ResourceController {
 
         // Insertar el nuevo usuario con la clave encriptada
         $userModel->save([
+            'username' => $username,
             'email'    => $email,
             'password' => password_hash($password, PASSWORD_DEFAULT)
         ]);

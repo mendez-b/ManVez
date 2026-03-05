@@ -27,10 +27,10 @@ class Database extends Config
     public array $default = [
         'DSN'          => '',
         'hostname'     => 'localhost',
-        'username'     => 'root',
-        'password'     => '1025886680MsBj.',
-        'database'     => 'proyect_db',
-        'DBDriver'     => 'MySQLi',
+        'username'     => 'postgres',
+        'password'     => '12052017PostJb.',
+        'database'     => 'lastking',
+        'DBDriver'     => 'Postgre',
         'DBPrefix'     => '',
         'pConnect'     => false,
         'DBDebug'      => true,
@@ -41,7 +41,7 @@ class Database extends Config
         'compress'     => false,
         'strictOn'     => false,
         'failover'     => [],
-        'port'         => 3306,
+        'port'         => 5432,
         'numberNative' => false,
         'foundRows'    => false,
         'dateFormat'   => [

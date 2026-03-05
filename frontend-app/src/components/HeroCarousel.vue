@@ -85,7 +85,7 @@ async function load() {
     const res = await axios.get(
       `${BASE}?path=/manga&query=limit=10%26order[followedCount]=desc%26includes[]=cover_art%26contentRating[]=safe`
     )
-    mangas.value = res.data.data
+    mangas.value = res.data.data || [];
   } catch (e) {
     console.error('Error carrusel:', e)
   } finally {
@@ -96,7 +96,9 @@ async function load() {
 
 function startAuto() {
   timer = setInterval(() => {
-    current.value = (current.value + 1) % mangas.value.length
+    if (mangas.value && mangas.value.length > 0) {
+      current.value = (current.value + 1) % mangas.value.length
+    }
   }, 5000)
 }
 function pause()  { clearInterval(timer) }

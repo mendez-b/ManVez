@@ -34,10 +34,10 @@
     <div v-if="loading" class="manga-grid">
       <SkeletonCard v-for="n in 15" :key="n" />
     </div>
-    <div v-else-if="results.length === 0 && searched" class="empty">
+    <div v-else-if="results?.length === 0 && searched" class="empty">
       No se encontraron resultados.
     </div>
-    <div v-else-if="results.length > 0">
+    <div v-else-if="results?.length > 0">
       <div class="manga-grid">
         <MangaCard
           v-for="manga in results"
@@ -137,9 +137,10 @@ async function search() {
     selectedGenres.value.forEach(g => { params += `%26includedTags[]=${g}` })
 
     const res = await axios.get(`${BASE}?path=/manga&query=${params}`)
-    results.value = res.data.data
+    const data = res.data.data || [];
+    results.value = data;
     // Si devuelve 15 resultados, asumimos que hay más
-    hasMore.value = res.data.data.length === LIMIT
+    hasMore.value = data.length === LIMIT
   } catch (err) {
     console.error(err)
   } finally {

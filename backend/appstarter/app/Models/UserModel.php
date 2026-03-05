@@ -10,6 +10,6 @@ class UserModel extends Model
 {
     protected $table            = 'users';
     protected $primaryKey       = 'id';
-    protected $allowedFields    = ['email', 'password']; // Campos que Vue enviará
+    protected $allowedFields    = ['username','email', 'password']; // Campos que Vue enviará
     protected $useTimestamps    = true;
 }
