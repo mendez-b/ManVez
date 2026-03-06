@@ -15,6 +15,7 @@ const routes = [
   { path: '/reset-password', name: 'ResetPassword', component: () => import('../views/ResetPasswordView.vue') },
   { path: '/favorites', name: 'Favorites', component: () => import('../views/FavoritesView.vue') },
   { path: '/profile', name: 'Profile', component: () => import('../views/ProfileView.vue') },
+  { path: '/profile/edit', name: 'EditProfile', component: () => import('../views/EditProfileView.vue') }
 ]
 
   const router = createRouter({

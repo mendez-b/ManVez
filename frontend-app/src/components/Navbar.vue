@@ -75,7 +75,7 @@
       </div>
 
       <!-- Switch de tema -->
-      <button class="theme-btn" @click="toggleTheme">
+      <button class="theme-btn" :class="{ 'theme-btn--hidden': searchOpen }" @click="toggleTheme">
         <Sun v-if="!isDark" :size="18" />
         <Moon v-else :size="18" />
       </button>
@@ -573,10 +573,16 @@ onUnmounted(() => {
 
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
+    .avatar-menu {
+    display: none;
+  }
   .nav-links,
   .login-btn,
   .search-bar--desktop {
     display: none;
+    .theme-btn--hidden {
+      display: none !important;
+    }
   }
 
   .search-wrap {

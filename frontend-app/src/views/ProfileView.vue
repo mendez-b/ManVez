@@ -2,24 +2,21 @@
   <div class="profile-page">
 
     <!-- Banner -->
-    <div class="profile-banner">
-      <div class="banner-bg"></div>
+    <div class="profile-banner" :style="bannerStyle">
+      <div v-if="!user.banner" class="banner-bg"></div>
     </div>
 
     <!-- Header del perfil -->
     <div class="profile-header">
       <div class="avatar-wrap">
         <img :src="avatarUrl" alt="Avatar" class="avatar-img" />
-        <label class="avatar-edit" title="Cambiar foto">
-          <Camera :size="16" />
-          <input type="file" accept="image/*" @change="onAvatarChange" hidden />
-        </label>
       </div>
 
       <div class="profile-info">
         <h1 class="profile-name">{{ user.username }}</h1>
         <p class="profile-handle">@{{ user.username?.toLowerCase() }}</p>
         <p class="profile-email">{{ user.email }}</p>
+        <p v-if="user.bio" class="profile-bio">{{ user.bio }}</p>
         <p class="profile-joined">
           <Calendar :size="14" />
           Se unió en {{ joinedDate }}
@@ -68,39 +65,57 @@
 
       <!-- Favoritos -->
       <div v-if="activeTab === 'favorites'">
-        <div v-if="favorites.length === 0" class="empty-state">
-          <BookOpen :size="40" />
+        <div v-if="mangaLists.favorites.length === 0" class="empty-state">
+          <Heart :size="40" />
           <p>No tienes mangas favoritos aún</p>
         </div>
         <div v-else class="manga-grid">
-          <div v-for="manga in favorites" :key="manga.id" class="manga-card">
+          <RouterLink v-for="manga in mangaLists.favorites" :key="manga.mangaId" :to="`/manga/${manga.mangaId}`" class="manga-card">
             <img :src="manga.cover" :alt="manga.title" />
             <p>{{ manga.title }}</p>
-          </div>
+          </RouterLink>
         </div>
       </div>
 
       <!-- Leyendo -->
       <div v-if="activeTab === 'reading'">
-        <div class="empty-state">
+        <div v-if="mangaLists.reading.length === 0" class="empty-state">
           <BookOpen :size="40" />
           <p>No tienes mangas en proceso</p>
+        </div>
+        <div v-else class="manga-grid">
+          <RouterLink v-for="manga in mangaLists.reading" :key="manga.mangaId" :to="`/manga/${manga.mangaId}`" class="manga-card">
+            <img :src="manga.cover" :alt="manga.title" />
+            <p>{{ manga.title }}</p>
+          </RouterLink>
         </div>
       </div>
 
       <!-- Completados -->
       <div v-if="activeTab === 'completed'">
-        <div class="empty-state">
+        <div v-if="mangaLists.completed.length === 0" class="empty-state">
           <CheckCircle :size="40" />
           <p>No tienes mangas completados</p>
+        </div>
+        <div v-else class="manga-grid">
+          <RouterLink v-for="manga in mangaLists.completed" :key="manga.mangaId" :to="`/manga/${manga.mangaId}`" class="manga-card">
+            <img :src="manga.cover" :alt="manga.title" />
+            <p>{{ manga.title }}</p>
+          </RouterLink>
         </div>
       </div>
 
       <!-- Abandonados -->
       <div v-if="activeTab === 'abandoned'">
-        <div class="empty-state">
+        <div v-if="mangaLists.abandoned.length === 0" class="empty-state">
           <XCircle :size="40" />
           <p>No tienes mangas abandonados</p>
+        </div>
+        <div v-else class="manga-grid">
+          <RouterLink v-for="manga in mangaLists.abandoned" :key="manga.mangaId" :to="`/manga/${manga.mangaId}`" class="manga-card">
+            <img :src="manga.cover" :alt="manga.title" />
+            <p>{{ manga.title }}</p>
+          </RouterLink>
         </div>
       </div>
 
@@ -121,12 +136,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { Camera, Calendar, BookOpen, CheckCircle, XCircle, Clock, Heart } from 'lucide-vue-next'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-
 const user = ref({
   username: '',
   email: '',
   avatar: null,
+  banner: null,
+  bio: '',
   created_at: null
 })
 
@@ -135,40 +150,51 @@ const avatarUrl = computed(() => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.username || 'U')}&background=1AAD4B&color=fff&size=128`
 })
 
+const bannerStyle = computed(() => {
+  if (user.value.banner) {
+    return { backgroundImage: `url(${user.value.banner})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+  }
+  return {}
+})
+
 const joinedDate = computed(() => {
   if (!user.value.created_at) return ''
   const d = new Date(user.value.created_at)
   return d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
 })
 
-const stats = ref({ reading: 0, completed: 0, abandoned: 0, favorites: 0 })
-const favorites = ref([])
+const mangaLists = ref({ favorites: [], reading: [], completed: [], abandoned: [] })
+
+const stats = computed(() => ({
+  reading:   mangaLists.value.reading.length,
+  completed: mangaLists.value.completed.length,
+  abandoned: mangaLists.value.abandoned.length,
+  favorites: mangaLists.value.favorites.length,
+}))
+
 const activeTab = ref('favorites')
 
 const tabs = [
-  { key: 'favorites',  label: 'Favoritos',  icon: Heart },
-  { key: 'reading',    label: 'Leyendo',    icon: BookOpen },
-  { key: 'completed',  label: 'Completados', icon: CheckCircle },
-  { key: 'abandoned',  label: 'Abandonados', icon: XCircle },
-  { key: 'history',    label: 'Historial',  icon: Clock },
+  { key: 'favorites',  label: 'Favoritos',   icon: Heart },
+  { key: 'reading',    label: 'Leyendo',      icon: BookOpen },
+  { key: 'completed',  label: 'Completados',  icon: CheckCircle },
+  { key: 'abandoned',  label: 'Abandonados',  icon: XCircle },
+  { key: 'history',    label: 'Historial',    icon: Clock },
 ]
-
-async function onAvatarChange(e) {
-  const file = e.target.files[0]
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = (ev) => {
-    user.value.avatar = ev.target.result
-    // Aquí puedes guardar en el backend
-  }
-  reader.readAsDataURL(file)
-}
 
 onMounted(() => {
   const stored = localStorage.getItem('user_data')
   if (stored) {
     try { user.value = { ...user.value, ...JSON.parse(stored) } } catch {}
   }
+
+  // Cargar listas desde localStorage
+  const saved = JSON.parse(localStorage.getItem('manga_lists') || '{}')
+  const lists = { favorites: [], reading: [], completed: [], abandoned: [] }
+  Object.values(saved).forEach(m => {
+    if (lists[m.list]) lists[m.list].push(m)
+  })
+  mangaLists.value = lists
 })
 </script>
 
@@ -179,7 +205,6 @@ onMounted(() => {
   padding-bottom: 60px;
 }
 
-/* ── Banner ─────────────────────────────────────────────────── */
 .profile-banner {
   height: 180px;
   position: relative;
@@ -193,7 +218,6 @@ onMounted(() => {
   background: linear-gradient(135deg, #0f172a 0%, #1a2744 40%, #0d2f1e 100%);
 }
 
-/* ── Header ─────────────────────────────────────────────────── */
 .profile-header {
   display: flex;
   align-items: flex-end;
@@ -203,10 +227,7 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.avatar-wrap {
-  position: relative;
-  flex-shrink: 0;
-}
+.avatar-wrap { position: relative; flex-shrink: 0; }
 
 .avatar-img {
   width: 100px;
@@ -216,23 +237,6 @@ onMounted(() => {
   object-fit: cover;
   background: var(--bg-secondary);
 }
-
-.avatar-edit {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--accent, #1AAD4B);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-.avatar-edit:hover { opacity: 0.85; }
 
 .profile-info {
   flex: 1;
@@ -256,7 +260,14 @@ onMounted(() => {
 .profile-email {
   color: var(--text-secondary);
   font-size: 0.85rem;
+  margin: 0 0 4px;
+}
+
+.profile-bio {
+  color: var(--text-primary);
+  font-size: 0.9rem;
   margin: 0 0 6px;
+  line-height: 1.5;
 }
 
 .profile-joined {
@@ -282,11 +293,8 @@ onMounted(() => {
   align-self: flex-start;
   margin-top: 52px;
 }
-.edit-btn:hover {
-  background: var(--bg-card);
-}
+.edit-btn:hover { background: var(--bg-card); }
 
-/* ── Stats ──────────────────────────────────────────────────── */
 .profile-stats {
   display: flex;
   gap: 32px;
@@ -312,7 +320,6 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-/* ── Tabs ───────────────────────────────────────────────────── */
 .profile-tabs {
   display: flex;
   border-bottom: 1px solid var(--border);
@@ -342,14 +349,9 @@ onMounted(() => {
   border-bottom-color: var(--accent, #1AAD4B);
 }
 
-.tab-btn:hover {
-  color: var(--text-primary);
-}
+.tab-btn:hover { color: var(--text-primary); }
 
-/* ── Contenido ──────────────────────────────────────────────── */
-.profile-content {
-  padding: 24px;
-}
+.profile-content { padding: 24px; }
 
 .empty-state {
   display: flex;
@@ -367,11 +369,20 @@ onMounted(() => {
   gap: 16px;
 }
 
+.manga-card {
+  text-decoration: none;
+}
+
 .manga-card img {
   width: 100%;
   border-radius: 8px;
   aspect-ratio: 2/3;
   object-fit: cover;
+  transition: transform 0.2s;
+}
+
+.manga-card:hover img {
+  transform: scale(1.03);
 }
 
 .manga-card p {
@@ -381,26 +392,10 @@ onMounted(() => {
   text-align: center;
 }
 
-/* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .profile-header {
-    padding: 0 16px 16px;
-  }
-
-  .profile-stats {
-    gap: 16px;
-    padding: 16px;
-    justify-content: space-around;
-  }
-
-  .edit-btn {
-    width: 100%;
-    text-align: center;
-    margin-top: 12px;
-  }
-
-  .profile-info {
-    padding-top: 12px;
-  }
+  .profile-header { padding: 0 16px 16px; }
+  .profile-stats { gap: 16px; padding: 16px; justify-content: space-around; }
+  .edit-btn { width: 100%; text-align: center; margin-top: 12px; }
+  .profile-info { padding-top: 12px; }
 }
 </style>
