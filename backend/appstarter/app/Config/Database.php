@@ -24,32 +24,32 @@ class Database extends Config
      *
      * @var array<string, mixed>
      */
-    public array $default = [
-     'DSN'          => '',
-     'hostname'     => env('DB_HOST', 'localhost'),
-     'username'     => env('DB_USER', 'postgres'),
-     'password'     => env('DB_PASS', '12052017PostJb.'),
-     'database'     => env('DB_NAME', 'lastking'),
-     'DBDriver'     => 'Postgre',
-     'DBPrefix'     => '',
-     'pConnect'     => false,
-     'DBDebug'      => true,
-     'charset'      => 'utf8',
-     'DBCollat'     => '',
-     'swapPre'      => '',
-     'encrypt'      => false,
-     'compress'     => false,
-     'strictOn'     => false,
-     'failover'     => [],
-     'port'         => (int) env('DB_PORT', 5432),
-     'numberNative' => false,
-     'foundRows'    => false,
-     'dateFormat'   => [
-         'date'     => 'Y-m-d',
-         'datetime' => 'Y-m-d H:i:s',
-         'time'     => 'H:i:s',
-     ],
- ];
+   public array $default = [
+    'DSN'          => '',
+    'hostname'     => 'localhost',
+    'username'     => '',
+    'password'     => '',
+    'database'     => '',
+    'DBDriver'     => 'Postgre',
+    'DBPrefix'     => '',
+    'pConnect'     => false,
+    'DBDebug'      => true,
+    'charset'      => 'utf8',
+    'DBCollat'     => '',
+    'swapPre'      => '',
+    'encrypt'      => false,
+    'compress'     => false,
+    'strictOn'     => false,
+    'failover'     => [],
+    'port'         => 5432,
+    'numberNative' => false,
+    'foundRows'    => false,
+    'dateFormat'   => [
+        'date'     => 'Y-m-d',
+        'datetime' => 'Y-m-d H:i:s',
+        'time'     => 'H:i:s',
+    ],
+];
 
     //    /**
     //     * Sample database connection for SQLite3.
@@ -193,12 +193,21 @@ class Database extends Config
     public function __construct()
     {
         parent::__construct();
+    
+     $this->default['hostname'] = env('DB_HOST', 'localhost');
+     $this->default['username'] = env('DB_USER', 'postgres');
+     $this->default['password'] = env('DB_PASS', '12052017PostJb.');
+     $this->default['database'] = env('DB_NAME', 'lastking');
+     $this->default['port']     = (int) env('DB_PORT', 5432);
 
-        // Ensure that we always set the database group to 'tests' if
-        // we are currently running an automated test suite, so that
-        // we don't overwrite live data on accident.
-        if (ENVIRONMENT === 'testing') {
-            $this->defaultGroup = 'tests';
+     if (ENVIRONMENT === 'testing') {
+        $this->defaultGroup = 'tests';
+    }
+        if (ENVIRONMENT === 'production') {
+            $this->default['DBDebug'] = false;
+        }
+        if (ENVIRONMENT === 'development') {
+            $this->default['DBDebug'] = true;
         }
     }
 }
