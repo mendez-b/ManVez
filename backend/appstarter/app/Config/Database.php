@@ -26,10 +26,10 @@ class Database extends Config
      */
     public array $default = [
      'DSN'          => '',
-     'hostname'     => 'localhost',
-     'username'     => 'postgres',
-     'password'     => '12052017PostJb.',
-     'database'     => 'lastking',
+     'hostname'     => env('DB_HOST', 'localhost'),
+     'username'     => env('DB_USER', 'postgres'),
+     'password'     => env('DB_PASS', '12052017PostJb.'),
+     'database'     => env('DB_NAME', 'lastking'),
      'DBDriver'     => 'Postgre',
      'DBPrefix'     => '',
      'pConnect'     => false,
@@ -41,15 +41,15 @@ class Database extends Config
      'compress'     => false,
      'strictOn'     => false,
      'failover'     => [],
-     'port'         => 5432,
+     'port'         => (int) env('DB_PORT', 5432),
      'numberNative' => false,
      'foundRows'    => false,
      'dateFormat'   => [
-        'date'     => 'Y-m-d',
-        'datetime' => 'Y-m-d H:i:s',
-        'time'     => 'H:i:s',
+         'date'     => 'Y-m-d',
+         'datetime' => 'Y-m-d H:i:s',
+         'time'     => 'H:i:s',
      ],
-  ];
+ ];
 
     //    /**
     //     * Sample database connection for SQLite3.
