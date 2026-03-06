@@ -97,6 +97,7 @@ const handleLogin = async () => {
     if (response.ok) {
       const data = await response.json();
       localStorage.setItem('user_token', data.token);
+      localStorage.setItem('user_data', JSON.stringify(data.user))
       window.dispatchEvent(new Event('user-login'));
       router.push('/');
     } else {

@@ -9,18 +9,15 @@ const routes = [
   { path: '/', component: HomeView },
   { path: '/search', component: SearchView },
   { path: '/read/:mangaId/:chapterId', component: ReaderView },
-  //AQUI SE REGISTRA LA RUTA PARA EL LOGIN
   { path: '/login', name: 'Login', component: () => import('../views/LoginView.vue') },
-  //AQUI SE REGISTRA LA RUTA PARA EL REGISTRO DE USUARIOS
   { path: '/register', name: 'Register', component: () => import('../views/RegisterView.vue') },
-  //AQUI SE REGISTRA LA RUTA PARA RECUPERAR CONTRASEÑA
-  {  path: '/forgot-password', name: 'ForgotPassword', component: () => import('../views/ForgotPasswordView.vue') },
-  //AQUI SE RESGITRA LA RUTA PARA QUE EL USUARIO PUEDA VER LA VISTA CUANDO DE CLICK EN SU CORREO
+  { path: '/forgot-password', name: 'ForgotPassword', component: () => import('../views/ForgotPasswordView.vue') },
   { path: '/reset-password', name: 'ResetPassword', component: () => import('../views/ResetPasswordView.vue') },
-  { path: '/favorites', name: 'Favorites', component: () => import('../views/FavoritesView.vue') }
+  { path: '/favorites', name: 'Favorites', component: () => import('../views/FavoritesView.vue') },
+  { path: '/profile', name: 'Profile', component: () => import('../views/ProfileView.vue') },
 ]
 
-const router = createRouter({
+  const router = createRouter({
   history: createWebHistory(),
   routes
 });

@@ -45,14 +45,39 @@
         </button>
       </div>
 
-      <!-- Botón Login / Usuario -->
+      <!-- Botón Login -->
       <RouterLink v-if="!isLoggedIn" to="/login" class="login-btn">
         <User :size="15" />
         <span>Iniciar sesión</span>
       </RouterLink>
-      <button v-else class="login-btn login-btn--user" @click="handleLogout">
-        <User :size="15" />
-        <span>Cerrar sesión</span>
+
+      <!-- Avatar con menú desplegable -->
+      <div v-else class="avatar-menu" ref="avatarMenu">
+        <button class="avatar-btn" @click="toggleDropdown">
+          <img :src="avatarUrl" alt="Perfil" class="avatar-img" />
+        </button>
+
+        <div v-if="dropdownOpen" class="dropdown">
+          <RouterLink to="/profile" class="dropdown-item" @click="dropdownOpen = false">
+            <User :size="16" />
+            Mi perfil
+          </RouterLink>
+          <RouterLink to="/favorites" class="dropdown-item" @click="dropdownOpen = false">
+            <Bookmark :size="16" />
+            Favoritos
+          </RouterLink>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item dropdown-item--danger" @click="handleLogout">
+            <LogOut :size="16" />
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+
+      <!-- Switch de tema -->
+      <button class="theme-btn" @click="toggleTheme">
+        <Sun v-if="!isDark" :size="18" />
+        <Moon v-else :size="18" />
       </button>
 
       <!-- Botón hamburguesa (solo móvil) -->
@@ -83,12 +108,16 @@
           <Bookmark :size="20" />
           Favoritos
         </RouterLink>
+        <RouterLink v-if="isLoggedIn" to="/profile" class="side-menu__item" @click="closeMenu">
+          <User :size="20" />
+          Mi perfil
+        </RouterLink>
         <RouterLink v-if="!isLoggedIn" to="/login" class="side-menu__item" @click="closeMenu">
           <User :size="20" />
           Iniciar sesión
         </RouterLink>
         <button v-else class="side-menu__item side-menu__item--btn" @click="handleLogout; closeMenu()">
-          <User :size="20" />
+          <LogOut :size="20" />
           Cerrar sesión
         </button>
       </nav>
@@ -97,9 +126,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search, Sun, Moon, Menu, X, Home, BookOpen, Bookmark, User } from 'lucide-vue-next'
+import { Search, Sun, Moon, Menu, X, Home, BookOpen, Bookmark, User, LogOut } from 'lucide-vue-next'
 
 const router      = useRouter()
 const searchQuery = ref('')
@@ -108,6 +137,33 @@ const searchInput = ref(null)
 const isDark      = ref(true)
 const menuOpen    = ref(false)
 const isLoggedIn  = ref(false)
+const dropdownOpen = ref(false)
+const avatarMenu  = ref(null)
+const userData    = ref(null)
+
+const avatarUrl = computed(() => {
+  if (userData.value?.avatar) return userData.value.avatar
+  const name = userData.value?.username || 'U'
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1AAD4B&color=fff&size=64`
+})
+
+function checkAuth() {
+  isLoggedIn.value = !!localStorage.getItem('user_token')
+  const stored = localStorage.getItem('user_data')
+  if (stored) {
+    try { userData.value = JSON.parse(stored) } catch {}
+  }
+}
+
+function toggleDropdown() {
+  dropdownOpen.value = !dropdownOpen.value
+}
+
+function handleClickOutside(e) {
+  if (avatarMenu.value && !avatarMenu.value.contains(e.target)) {
+    dropdownOpen.value = false
+  }
+}
 
 async function openSearch() {
   searchOpen.value = true
@@ -120,10 +176,6 @@ function closeSearch() {
   searchQuery.value = ''
 }
 
-function checkAuth() {
-  isLoggedIn.value = !!localStorage.getItem('user_token')
-}
-
 function goToSearch() {
   if (searchQuery.value.trim()) {
     router.push({ path: '/search', query: { q: searchQuery.value } })
@@ -132,9 +184,16 @@ function goToSearch() {
   }
 }
 
+function toggleTheme() {
+  isDark.value = !isDark.value
+  document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
+}
+
 function handleLogout() {
   localStorage.removeItem('user_token')
+  localStorage.removeItem('user_data')
   isLoggedIn.value = false
+  dropdownOpen.value = false
   router.push('/')
 }
 
@@ -144,6 +203,11 @@ function closeMenu() { menuOpen.value = false }
 onMounted(() => {
   checkAuth()
   window.addEventListener('user-login', checkAuth)
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
@@ -325,10 +389,86 @@ onMounted(() => {
   opacity: 0.85;
 }
 
-.login-btn--user {
+/* ── Avatar menu ────────────────────────────────────────────── */
+.avatar-menu {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-btn {
+  background: none;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: border-color 0.2s;
+}
+
+.avatar-btn:hover {
+  border-color: var(--text-primary);
+}
+
+.avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
   background: var(--bg-card);
-  color: var(--text-primary);
   border: 1px solid var(--border);
+  border-radius: 10px;
+  min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  overflow: hidden;
+  animation: fadeDown 0.15s ease;
+  z-index: 300;
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dropdown-item:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.dropdown-item--danger {
+  color: #e74c3c;
+}
+
+.dropdown-item--danger:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
 }
 
 /* ── Tema ───────────────────────────────────────────────────── */
@@ -353,7 +493,6 @@ onMounted(() => {
   padding: 6px 8px;
   border-radius: 6px;
   cursor: pointer;
-  display: none;
   align-items: center;
 }
 
