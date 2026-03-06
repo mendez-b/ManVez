@@ -93,6 +93,15 @@ class AuthController extends ResourceController
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             exit;
         }
+         try {
+           $db = \Config\Database::connect();
+           $db->table('users')->select('id')->limit(1)->get();
+        } catch (\Exception $e) {
+           return $this->response->setStatusCode(500)->setJSON([
+               'error' => $e->getMessage(),
+               'trace' => $e->getTraceAsString()
+           ]);
+        }
 
 
         // Parsear entrada (JSON o form)
