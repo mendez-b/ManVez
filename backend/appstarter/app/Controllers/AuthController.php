@@ -4,13 +4,19 @@ namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
 
-class AuthController extends ResourceController {
-    public function login() {
-    
-        header("Access-Control-Allow-Origin: http://localhost:5173");
+class AuthController extends ResourceController
+{
+    public function login()
+    {
+
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
+        if (in_array($origin, $allowed)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
         header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-    
+
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             exit;
         }
@@ -76,10 +82,14 @@ class AuthController extends ResourceController {
     //esta es la logica para recibir los datos de RegisterView.Vue
     public function register()
     {
-        header("Access-Control-Allow-Origin: http://localhost:5173");
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
+        if (in_array($origin, $allowed)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
         header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-    
+
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             exit;
         }
@@ -129,7 +139,7 @@ class AuthController extends ResourceController {
             // Log para debug
             error_log("Intentando registrar usuario: " . $email);
             error_log("DB Platform: " . $db->getPlatform());
-            
+
             // Insertar el nuevo usuario directamente con query
             $result = $db->table('users')->insert([
                 'username' => $username,
@@ -141,7 +151,7 @@ class AuthController extends ResourceController {
 
             error_log("Resultado insert: " . ($result ? "true" : "false"));
             error_log("Error de BD: " . ($db->error()['message'] ?? 'none'));
-            
+
             // Log queries
             if (method_exists($db, 'getLastQuery')) {
                 error_log("Last Query: " . $db->getLastQuery());
@@ -164,7 +174,12 @@ class AuthController extends ResourceController {
     }
     public function forgotPassword()
     {
-        header("Access-Control-Allow-Origin: http://localhost:5173");
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
+        if (in_array($origin, $allowed)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
+
         header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -237,7 +252,7 @@ class AuthController extends ResourceController {
             service('logger')->error('forgotPassword DB error on password_resets: ' . $e->getMessage());
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Server DB error']);
         }
-    
+
         // 2. Aquí deberías guardar este token en una tabla 'password_resets' con su fecha
         $db->table('password_resets')->insert([
             'email' => $email,
@@ -295,12 +310,16 @@ class AuthController extends ResourceController {
 
     //este metodo actualizara la contraseña y si todo es valido actualizara al usuario en la base de datos
     public function resetPassword()
-    {   
+    {
 
-        header("Access-Control-Allow-Origin: http://localhost:5173");
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
+        if (in_array($origin, $allowed)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
         header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-    
+
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             exit;
         }
