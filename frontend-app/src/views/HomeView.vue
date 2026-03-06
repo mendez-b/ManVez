@@ -42,7 +42,7 @@ import MangaCard from '../components/MangaCard.vue'
 import SkeletonCard from '../components/SkeletonCard.vue'
 import HeroCarousel from '../components/HeroCarousel.vue'
 
-const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
+const BASE = 'http://localhost:8080/api/mangadex'
 const popularMangas = ref([])
 const recentMangas = ref([])
 const loadingPopular = ref(true)

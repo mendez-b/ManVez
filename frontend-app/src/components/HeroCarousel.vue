@@ -69,8 +69,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
-const BASE   = 'https://manvez-backend.onrender.com/api/mangadex'
-const COVERS = 'https://manvez-backend.onrender.com/covers'
+const BASE   = 'http://localhost:8080/api/mangadex'
+const COVERS = 'http://localhost:8080/covers'
 
 const mangas  = ref([])
 const loading = ref(true)

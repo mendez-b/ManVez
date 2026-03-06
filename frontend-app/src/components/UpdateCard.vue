@@ -52,7 +52,7 @@ const props = defineProps({
   loadingChapters: { type: Boolean, default: false }
 })
 
-const COVERS = 'https://manvez-backend.onrender.com/covers'
+const COVERS = 'http://localhost:8080/covers'
 
 const title = computed(() => {
   const t = props.manga.attributes?.title

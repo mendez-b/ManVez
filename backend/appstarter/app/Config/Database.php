@@ -25,7 +25,6 @@ class Database extends Config
      * @var array<string, mixed>
      */
     public array $default = [
-<<<<<<< HEAD
      'DSN'          => '',
      'hostname'     => 'localhost',
      'username'     => 'postgres',
@@ -51,33 +50,6 @@ class Database extends Config
         'time'     => 'H:i:s',
      ],
   ];
-=======
-        'DSN'          => '',
-        'hostname'     => 'localhost',
-        'username'     => 'postgres',
-        'password'     => '12052017PostJb.',
-        'database'     => 'lastking',
-        'DBDriver'     => 'Postgre',
-        'DBPrefix'     => '',
-        'pConnect'     => false,
-        'DBDebug'      => true,
-        'charset'      => 'utf8',
-        'DBCollat'     => '',
-        'swapPre'      => '',
-        'encrypt'      => false,
-        'compress'     => false,
-        'strictOn'     => false,
-        'failover'     => [],
-        'port'         => 5432,
-        'numberNative' => false,
-        'foundRows'    => false,
-        'dateFormat'   => [
-            'date'     => 'Y-m-d',
-            'datetime' => 'Y-m-d H:i:s',
-            'time'     => 'H:i:s',
-        ],
-    ];
->>>>>>> a2e6bc05f8cbb1948cab227739818bc2002c77c9
 
     //    /**
     //     * Sample database connection for SQLite3.

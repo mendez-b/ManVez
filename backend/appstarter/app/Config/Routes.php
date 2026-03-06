@@ -7,6 +7,8 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 $routes->get('/api/mangadex', 'MangaProxy::api');
+$routes->get('/api/test', 'MangaProxy::test');
+$routes->get('/test', 'AuthController::test');
 $routes->get('/covers/(:segment)/(:segment)', 'MangaProxy::cover/$1/$2');
 
 $routes->get('/', 'Home::index');

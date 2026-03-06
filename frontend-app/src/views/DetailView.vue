@@ -33,7 +33,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
-const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
+const BASE = 'http://localhost:8080/api/mangadex'
 const route = useRoute()
 const manga = ref(null)
 const loading = ref(true)
@@ -66,7 +66,7 @@ const coverUrl = computed(() => {
   if (!manga.value) return ''
   const coverRel = manga.value.relationships?.find(r => r.type === 'cover_art')
   if (coverRel?.attributes?.fileName) {
-    return `https://manvez-backend.onrender.com/covers/${mangaId.value}/${coverRel.attributes.fileName}.512.jpg`
+    return `http://localhost:8080/covers/${mangaId.value}/${coverRel.attributes.fileName}.512.jpg`
   }
   return 'https://placehold.co/256x360/0a0f1e/024F32?text=Sin+Cover'
 })
