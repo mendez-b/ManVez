@@ -127,7 +127,7 @@ class AuthController extends ResourceController
 
         // Obtener conexión a BD
         $db = \Config\Database::connect();
-        $db->logQueries = true;
+        
 
         // Validar si el usuario ya existe
         $existingUser = $db->table('users')->where('email', $email)->get()->getRow();
