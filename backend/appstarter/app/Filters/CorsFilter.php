@@ -7,27 +7,40 @@ use CodeIgniter\Filters\FilterInterface;
 
 class CorsFilter implements FilterInterface
 {
+    private array $allowed = [
+        'http://localhost:5173',
+        'https://man-vez.vercel.app',
+        'https://last-king.vercel.app',
+    ];
+
     public function before(RequestInterface $request, $arguments = null)
     {
         $origin = $request->getHeaderLine('Origin');
-        $allowed = ['http://localhost:5173', 'https://man-vez.vercel.app', 'https://last-king.vercel.app'];
+        $response = service('response');
 
-        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-        header('Access-Control-Allow-Credentials: true');
-
-        if (in_array($origin, $allowed)) {
-            header('Access-Control-Allow-Origin: ' . $origin);
+        if (in_array($origin, $this->allowed)) {
+            $response->setHeader('Access-Control-Allow-Origin', $origin);
         }
+        $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+        $response->setHeader('Access-Control-Allow-Credentials', 'true');
 
         if (strtoupper($request->getMethod()) === 'OPTIONS') {
-            header('HTTP/1.1 200 OK');
-            exit();
+            return $response->setStatusCode(200)->setBody('');
         }
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
+        $origin = $request->getHeaderLine('Origin');
+
+        if (in_array($origin, $this->allowed)) {
+            $response->setHeader('Access-Control-Allow-Origin', $origin);
+        }
+        $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+        $response->setHeader('Access-Control-Allow-Credentials', 'true');
+
         return $response;
     }
 }
