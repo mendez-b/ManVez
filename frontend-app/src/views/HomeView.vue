@@ -42,7 +42,7 @@ import MangaCard from '../components/MangaCard.vue'
 import SkeletonCard from '../components/SkeletonCard.vue'
 import HeroCarousel from '../components/HeroCarousel.vue'
 
-const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
+const BASE = '/api/mangadex'
 const popularMangas = ref([])
 const recentMangas = ref([])
 const loadingPopular = ref(true)
@@ -50,21 +50,21 @@ const loadingRecent = ref(true)
 
 onMounted(async () => {
   try {
+    
     const popRes = await axios.get(
-      `${BASE}?path=/manga&query=limit=5%26order[followedCount]=desc%26includes[]=cover_art%26contentRating[]=safe`
+      `${BASE}/manga?limit=5&order[followedCount]=desc&includes[]=cover_art&contentRating[]=safe`
     )
     popularMangas.value = popRes.data.data
     loadingPopular.value = false
 
     const recRes = await axios.get(
-      `${BASE}?path=/manga&query=limit=30%26order[updatedAt]=desc%26includes[]=cover_art%26contentRating[]=safe`
+      `${BASE}/manga?limit=30&order[updatedAt]=desc&includes[]=cover_art&contentRating[]=safe`
     )
     recentMangas.value = recRes.data.data
     loadingRecent.value = false
+
   } catch (error) {
     console.error('Error al cargar mangas:', error)
-    loadingPopular.value = false
-    loadingRecent.value = false
   }
 })
 </script>

@@ -33,7 +33,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
-const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
+const BASE = '/api/mangadex'
 const route = useRoute()
 const manga = ref(null)
 const loading = ref(true)
@@ -65,8 +65,10 @@ const tags = computed(() => {
 const coverUrl = computed(() => {
   if (!manga.value) return ''
   const coverRel = manga.value.relationships?.find(r => r.type === 'cover_art')
+  
+  // Usamos el servidor oficial de MangaDex para las imágenes
   if (coverRel?.attributes?.fileName) {
-    return `https://manvez-backend.onrender.com/covers/${mangaId.value}/${coverRel.attributes.fileName}.512.jpg`
+    return `https://uploads.mangadex.org/covers/${mangaId.value}/${coverRel.attributes.fileName}.512.jpg`
   }
   return 'https://placehold.co/256x360/0a0f1e/024F32?text=Sin+Cover'
 })
@@ -74,11 +76,11 @@ const coverUrl = computed(() => {
 onMounted(async () => {
   try {
     const res = await axios.get(
-      `${BASE}?path=/manga/${mangaId.value}&query=includes[]=cover_art`
+      `${BASE}/manga/${mangaId.value}?includes[]=cover_art`
     )
     manga.value = res.data.data
   } catch (err) {
-    console.error(err)
+    console.error("Error al obtener detalles:", err)
   } finally {
     loading.value = false
   }

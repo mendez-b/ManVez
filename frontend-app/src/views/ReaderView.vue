@@ -86,7 +86,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
-const BASE = 'https://manvez-backend.onrender.com/api/mangadex'
+const BASE = '/api/mangadex'
 const route = useRoute()
 
 const chapters = ref([])
@@ -113,25 +113,34 @@ const hasPrev = computed(() => currentIndex.value < chapters.value.length - 1) /
 const hasNext = computed(() => currentIndex.value > 0) // hay capítulo más nuevo
 
 async function loadChapters() {
-  const res = await axios.get(
-    `${BASE}?path=/manga/${route.params.mangaId}/feed&query=limit=100%26translatedLanguage[]=en%26translatedLanguage[]=es%26order[chapter]=desc`
-  )
-  chapters.value = res.data.data
-  if (chapters.value.length > 0) {
-    currentChapter.value = chapters.value[0].id
-    await loadChapter()
-  } else {
+  try {
+    const res = await axios.get(
+      `${BASE}/manga/${route.params.mangaId}/feed?limit=100&translatedLanguage[]=en&translatedLanguage[]=es&order[chapter]=desc`
+    )
+    
+    chapters.value = res.data.data
+    if (chapters.value.length > 0) {
+      currentChapter.value = chapters.value[0].id
+      await loadChapter()
+    } else {
+      loading.value = false
+    }
+  } catch (err) {
+    console.error("Error al cargar la lista de capítulos:", err)
     loading.value = false
   }
 }
 
+
 async function loadChapter() {
   loading.value = true
   currentPage.value = 0
+  
   try {
     const res = await axios.get(
-      `${BASE}?path=/at-home/server/${currentChapter.value}&query=`
+      `${BASE}/at-home/server/${currentChapter.value}`
     )
+    
     const { baseUrl, chapter } = res.data
 
     if (chapter?.data?.length > 0) {
@@ -146,7 +155,7 @@ async function loadChapter() {
       pages.value = []
     }
   } catch (err) {
-    console.error(err)
+    console.error("Error al cargar las páginas del capítulo:", err)
     pages.value = []
   } finally {
     loading.value = false

@@ -20,12 +20,14 @@
         >
           <span class="chapter-dot">•</span>
           <RouterLink
-            :to="`/manga/${manga.id}/read?chapter=${ch.id}`"
-            class="chapter-name"
-            @click.stop
-          >
-            Chapter {{ ch.attributes.chapter || '?' }}
-            <span v-if="ch.attributes.title" class="chapter-subtitle"> - {{ truncate(ch.attributes.title, 18) }}</span>
+            :to="`/read/${manga.id}/${ch.id}`"
+             class="chapter-name"
+             @click.stop
+           >
+             Chapter {{ ch.attributes.chapter || '?' }}
+            <span v-if="ch.attributes.title" class="chapter-subtitle"> 
+             - {{ truncate(ch.attributes.title, 18) }}
+            </span>
           </RouterLink>
           <span class="chapter-date">{{ timeAgo(ch.attributes.publishAt) }}</span>
         </div>
@@ -52,7 +54,7 @@ const props = defineProps({
   loadingChapters: { type: Boolean, default: false }
 })
 
-const COVERS = 'https://manvez-backend.onrender.com/covers'
+const COVERS = 'https://uploads.mangadex.org/covers'
 
 const title = computed(() => {
   const t = props.manga.attributes?.title
@@ -63,7 +65,9 @@ const title = computed(() => {
 const coverUrl = computed(() => {
   const rel = props.manga.relationships?.find(r => r.type === 'cover_art')
   const file = rel?.attributes?.fileName
-  return file ? `${COVERS}/${props.manga.id}/${file}.256.jpg` : ''
+  
+  // Ahora la URL se construye para el servidor de MangaDex directamente
+  return file ? `${COVERS}/${props.manga.id}/${file}.256.jpg` : 'https://placehold.co/256x360/0a0f1e/024F32?text=Sin+Cover'
 })
 
 function truncate(str, max) {

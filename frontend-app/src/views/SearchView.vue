@@ -75,7 +75,7 @@ import axios from 'axios'
 import MangaCard from '../components/MangaCard.vue'
 import SkeletonCard from '../components/SkeletonCard.vue'
 
-const BASE    = 'https://manvez-backend.onrender.com/api/mangadex'
+const BASE = '/api/mangadex'
 const LIMIT   = 15
 const route   = useRoute()
 
@@ -131,18 +131,37 @@ function newSearch() {
 async function search() {
   loading.value = true
   searched.value = true
+  
   try {
-    let params = `limit=${LIMIT}%26offset=${offset.value}%26includes[]=cover_art%26contentRating[]=safe`
-    if (query.value.trim()) params += `%26title=${encodeURIComponent(query.value)}`
-    selectedGenres.value.forEach(g => { params += `%26includedTags[]=${g}` })
+    // 1. Creamos los parámetros de forma limpia
+    const params = new URLSearchParams({
+      limit: LIMIT,
+      offset: offset.value,
+      'contentRating[]': 'safe',
+      'includes[]': 'cover_art'
+    })
 
-    const res = await axios.get(`${BASE}?path=/manga&query=${params}`)
-    const data = res.data.data || [];
-    results.value = data;
-    // Si devuelve 15 resultados, asumimos que hay más
+    // 2. Si hay texto en el buscador, lo añadimos
+    if (query.value.trim()) {
+      params.append('title', query.value.trim())
+    }
+
+    // 3. Añadimos los géneros seleccionados
+    selectedGenres.value.forEach(genreId => {
+      params.append('includedTags[]', genreId)
+    })
+
+    // 4. La petición final (Ruta limpia: /api/mangadex/manga?...)
+    const res = await axios.get(`${BASE}/manga?${params.toString()}`)
+    
+    const data = res.data.data || []
+    results.value = data
+    
+    // Si devuelve el límite (15), asumimos que hay más páginas
     hasMore.value = data.length === LIMIT
   } catch (err) {
-    console.error(err)
+    console.error("Error en la búsqueda:", err)
+    results.value = []
   } finally {
     loading.value = false
   }

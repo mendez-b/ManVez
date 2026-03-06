@@ -69,8 +69,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
-const BASE   = 'https://manvez-backend.onrender.com/api/mangadex'
-const COVERS = 'https://manvez-backend.onrender.com/covers'
+const BASE = '/api/mangadex'
+const COVERS = 'https://uploads.mangadex.org/covers'
 
 const mangas  = ref([])
 const loading = ref(true)
@@ -83,7 +83,7 @@ function onResize() { isMobile.value = window.innerWidth <= 600 }
 async function load() {
   try {
     const res = await axios.get(
-      `${BASE}?path=/manga&query=limit=10%26order[followedCount]=desc%26includes[]=cover_art%26contentRating[]=safe`
+      `${BASE}/manga?limit=10&order[followedCount]=desc&includes[]=cover_art&contentRating[]=safe`
     )
     mangas.value = res.data.data || [];
   } catch (e) {
@@ -118,6 +118,7 @@ function getTitle(m) {
 function getCover(m) {
   const rel = m.relationships?.find(r => r.type === 'cover_art')
   const file = rel?.attributes?.fileName
+  // Ahora apunta a: https://uploads.mangadex.org/covers/ID_MANGA/ARCHIVO.jpg
   return file ? `${COVERS}/${m.id}/${file}.512.jpg` : ''
 }
 
