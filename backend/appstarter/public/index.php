@@ -53,6 +53,9 @@ if (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) 
     http_response_code(200);
     exit();
 }
+
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 /*
  *---------------------------------------------------------------
  * BOOTSTRAP THE APPLICATION
