@@ -54,11 +54,9 @@ const props = defineProps({
   loadingChapters: { type: Boolean, default: false }
 })
 
-<<<<<<< HEAD
+
 const COVERS = 'https://uploads.mangadex.org/covers'
-=======
-const COVERS = 'http://localhost:8080/covers'
->>>>>>> a7cbc4b0b2ef03fe389dd30dc001794b05f5f2c1
+
 
 const title = computed(() => {
   const t = props.manga.attributes?.title

@@ -75,11 +75,9 @@ import axios from 'axios'
 import MangaCard from '../components/MangaCard.vue'
 import SkeletonCard from '../components/SkeletonCard.vue'
 
-<<<<<<< HEAD
+
 const BASE = '/api/mangadex'
-=======
-const BASE    = 'http://localhost:8080/api/mangadex'
->>>>>>> a7cbc4b0b2ef03fe389dd30dc001794b05f5f2c1
+
 const LIMIT   = 15
 const route   = useRoute()
 

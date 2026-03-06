@@ -33,11 +33,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
-<<<<<<< HEAD
+
 const BASE = '/api/mangadex'
-=======
-const BASE = 'http://localhost:8080/api/mangadex'
->>>>>>> a7cbc4b0b2ef03fe389dd30dc001794b05f5f2c1
+
+
 const route = useRoute()
 const manga = ref(null)
 const loading = ref(true)
@@ -72,11 +71,11 @@ const coverUrl = computed(() => {
   
   // Usamos el servidor oficial de MangaDex para las imágenes
   if (coverRel?.attributes?.fileName) {
-<<<<<<< HEAD
+
     return `https://uploads.mangadex.org/covers/${mangaId.value}/${coverRel.attributes.fileName}.512.jpg`
-=======
+
     return `http://localhost:8080/covers/${mangaId.value}/${coverRel.attributes.fileName}.512.jpg`
->>>>>>> a7cbc4b0b2ef03fe389dd30dc001794b05f5f2c1
+ a7cbc4b0b2ef03fe389dd30dc001794b05f5f2c1
   }
   return 'https://placehold.co/256x360/0a0f1e/024F32?text=Sin+Cover'
 })

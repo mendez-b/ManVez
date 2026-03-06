@@ -69,13 +69,9 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
-<<<<<<< HEAD
+
 const BASE = '/api/mangadex'
 const COVERS = 'https://uploads.mangadex.org/covers'
-=======
-const BASE   = 'http://localhost:8080/api/mangadex'
-const COVERS = 'http://localhost:8080/covers'
->>>>>>> a7cbc4b0b2ef03fe389dd30dc001794b05f5f2c1
 
 const mangas  = ref([])
 const loading = ref(true)
