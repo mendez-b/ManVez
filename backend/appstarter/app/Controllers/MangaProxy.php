@@ -8,11 +8,20 @@ class MangaProxy extends Controller
 {
     private $baseUrl = 'https://api.mangadex.org';
 
+<<<<<<< HEAD
+    public function test()
+    {
+        return $this->response
+            ->setHeader('Access-Control-Allow-Origin', '*')
+            ->setHeader('Content-Type', 'application/json')
+            ->setBody(json_encode(['status' => 'ok', 'message' => 'MangaProxy working']));
+=======
     public function __construct()
     {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type');
+>>>>>>> f27e43bd5c85ba6cb5b31f68736b9458749bed56
     }
 
     public function api()
@@ -29,16 +38,37 @@ class MangaProxy extends Controller
         return $this->response
             ->setHeader('Access-Control-Allow-Origin', '*')
             ->setHeader('Content-Type', 'application/json')
+<<<<<<< HEAD
+            ->setBody($result ?: json_encode(['error' => 'Failed to fetch']));
+=======
             ->setJSON([
                 'url' => $url,
                 'result' => $result,
                 'length' => strlen($result ?? '')
             ]);
+>>>>>>> f27e43bd5c85ba6cb5b31f68736b9458749bed56
     }
 
     public function cover($mangaId, $fileName)
     {
         $url = "https://uploads.mangadex.org/covers/{$mangaId}/{$fileName}";
+<<<<<<< HEAD
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'User-Agent: ManVez/1.0',
+            'Referer: https://mangadex.org'
+        ]);
+        $result = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+=======
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -54,14 +84,20 @@ class MangaProxy extends Controller
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
+>>>>>>> f27e43bd5c85ba6cb5b31f68736b9458749bed56
         if ($httpCode === 200 && $result) {
             return $this->response
                 ->setHeader('Access-Control-Allow-Origin', '*')
                 ->setHeader('Content-Type', 'image/jpeg')
                 ->setBody($result);
         }
+<<<<<<< HEAD
+        
+        return $this->response->setStatusCode(404)->setBody('Cover not found');
+=======
 
         return $this->response->setStatusCode(404)->setBody('No encontrada');
+>>>>>>> f27e43bd5c85ba6cb5b31f68736b9458749bed56
     }
 
     private function curlGet($url, $binary = false)
@@ -72,6 +108,10 @@ class MangaProxy extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+<<<<<<< HEAD
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+=======
+>>>>>>> f27e43bd5c85ba6cb5b31f68736b9458749bed56
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Accept: application/json',
             'User-Agent: ManVez/1.0'

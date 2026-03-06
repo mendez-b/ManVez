@@ -86,7 +86,11 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
+<<<<<<< HEAD
 const BASE = '/api/mangadex'
+=======
+const BASE = 'http://localhost:8080/api/mangadex'
+>>>>>>> a7cbc4b0b2ef03fe389dd30dc001794b05f5f2c1
 const route = useRoute()
 
 const chapters = ref([])

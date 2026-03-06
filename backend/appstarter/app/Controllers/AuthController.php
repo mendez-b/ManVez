@@ -168,7 +168,10 @@ class AuthController extends ResourceController
         }
     }
 
-    //esta es la logica para recuperar la contraseña del usuario
+    public function test()
+    {
+        return $this->response->setJSON(['status' => 'ok']);
+    }
     public function forgotPassword()
     {
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
