@@ -16,7 +16,7 @@
         <img :src="previewAvatar" alt="Avatar" class="edit-avatar" />
         <label class="avatar-edit-btn" title="Cambiar foto">
           <Camera :size="16" />
-          <input type="file" accept="image/*" @change="onAvatarChange" hidden ref="avatarInput" />
+          <input type="file" accept="image/*" @change="onAvatarChange" hidden />
         </label>
       </div>
     </div>
@@ -59,10 +59,8 @@
         <span class="field-count">{{ form.bio?.length || 0 }}/160</span>
       </div>
 
-      <!-- Mensaje éxito -->
       <p v-if="successMsg" class="success-msg">{{ successMsg }}</p>
       <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
-
     </div>
   </div>
 </template>
@@ -72,19 +70,17 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Camera } from 'lucide-vue-next'
 
-const router  = useRouter()
-const saving  = ref(false)
+const router     = useRouter()
+const saving     = ref(false)
 const successMsg = ref('')
 const errorMsg   = ref('')
+const API        = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
-const avatarFile = ref(null)
-const previewAvatar  = ref('')
-const previewBanner  = ref('')
-
-const form = ref({
-  username: '',
-  bio: ''
-})
+const form = ref({ username: '', bio: '' })
+const previewAvatar = ref('')
+const previewBanner = ref('')
+const newAvatar     = ref(null) // base64 nueva imagen
+const newBanner     = ref(null) // base64 nueva portada
 
 const bannerStyle = computed(() => {
   if (previewBanner.value) {
@@ -93,50 +89,60 @@ const bannerStyle = computed(() => {
   return {}
 })
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-
-function onAvatarChange(e) {
-  const file = e.target.files[0]
-  if (!file) return
-  avatarFile.value = file
-  const reader = new FileReader()
-  reader.onload = (ev) => { previewAvatar.value = ev.target.result }
-  reader.readAsDataURL(file)
+function toBase64(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => resolve(e.target.result)
+    reader.readAsDataURL(file)
+  })
 }
 
-function onBannerChange(e) {
+async function onAvatarChange(e) {
   const file = e.target.files[0]
   if (!file) return
-  const reader = new FileReader()
-  reader.onload = (ev) => { previewBanner.value = ev.target.result }
-  reader.readAsDataURL(file)
+  const b64 = await toBase64(file)
+  previewAvatar.value = b64
+  newAvatar.value = b64
+}
+
+async function onBannerChange(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  const b64 = await toBase64(file)
+  previewBanner.value = b64
+  newBanner.value = b64
 }
 
 async function saveProfile() {
-  saving.value = true
+  saving.value  = true
   errorMsg.value = ''
 
   try {
     const stored = JSON.parse(localStorage.getItem('user_data') || '{}')
-    
-    const formData = new FormData()
-    formData.append('user_id', stored.id)
-    if (avatarFile.value) {
-      formData.append('profile_pic', avatarFile.value)
+
+    const body = {
+      user_id:  stored.id,
+      username: form.value.username,
+      bio:      form.value.bio,
     }
+    if (newAvatar.value) body.avatar = newAvatar.value
+    if (newBanner.value) body.banner = newBanner.value
 
     const response = await fetch(`${API}/profile`, {
       method: 'PUT',
-      body: formData
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
     })
 
     if (response.ok) {
       const data = await response.json()
       localStorage.setItem('user_data', JSON.stringify(data.user))
+      window.dispatchEvent(new Event('user-login')) // actualizar navbar
       successMsg.value = '¡Perfil actualizado!'
       setTimeout(() => router.push('/profile'), 1200)
     } else {
-      errorMsg.value = 'Error al actualizar perfil.'
+      const err = await response.json()
+      errorMsg.value = err.error || 'Error al actualizar perfil.'
     }
   } catch (err) {
     console.error(err)
@@ -151,9 +157,9 @@ onMounted(() => {
   if (stored) {
     const data = JSON.parse(stored)
     form.value.username = data.username || ''
-    form.value.bio      = data.bio || ''
-    previewAvatar.value = data.profile_pic_url || data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || 'U')}&background=1AAD4B&color=fff&size=128`
-    previewBanner.value = data.banner || ''
+    form.value.bio      = data.bio      || ''
+    previewAvatar.value = data.avatar   || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || 'U')}&background=1AAD4B&color=fff&size=128`
+    previewBanner.value = data.banner   || ''
   }
 })
 </script>
@@ -165,7 +171,6 @@ onMounted(() => {
   padding-bottom: 60px;
 }
 
-/* ── Banner ─────────────────────────────────────────────────── */
 .edit-banner {
   height: 180px;
   background: linear-gradient(135deg, #0f172a 0%, #1a2744 40%, #0d2f1e 100%);
@@ -188,11 +193,8 @@ onMounted(() => {
   transition: background 0.2s;
   backdrop-filter: blur(4px);
 }
-.banner-edit-btn:hover {
-  background: rgba(0,0,0,0.7);
-}
+.banner-edit-btn:hover { background: rgba(0,0,0,0.7); }
 
-/* ── Avatar ─────────────────────────────────────────────────── */
 .edit-avatar-wrap {
   padding: 0 24px;
   margin-top: -50px;
@@ -231,10 +233,7 @@ onMounted(() => {
 }
 .avatar-edit-btn:hover { opacity: 0.85; }
 
-/* ── Formulario ─────────────────────────────────────────────── */
-.edit-form-wrap {
-  padding: 0 24px;
-}
+.edit-form-wrap { padding: 0 24px; }
 
 .edit-header {
   display: flex;
@@ -250,11 +249,7 @@ onMounted(() => {
   margin: 0;
 }
 
-.edit-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
+.edit-actions { display: flex; gap: 10px; align-items: center; }
 
 .cancel-btn {
   padding: 8px 16px;
@@ -267,9 +262,7 @@ onMounted(() => {
   text-decoration: none;
   transition: background 0.2s;
 }
-.cancel-btn:hover {
-  background: var(--bg-card);
-}
+.cancel-btn:hover { background: var(--bg-card); }
 
 .save-btn {
   padding: 8px 20px;
@@ -285,11 +278,7 @@ onMounted(() => {
 .save-btn:hover:not(:disabled) { opacity: 0.85; }
 .save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── Campos ─────────────────────────────────────────────────── */
-.field-group {
-  position: relative;
-  margin-bottom: 20px;
-}
+.field-group { position: relative; margin-bottom: 20px; }
 
 .field-label {
   display: block;
@@ -311,16 +300,9 @@ onMounted(() => {
   transition: border-color 0.2s;
   box-sizing: border-box;
 }
+.field-input:focus { border-color: var(--accent); }
 
-.field-input:focus {
-  border-color: var(--accent);
-}
-
-.field-textarea {
-  resize: none;
-  font-family: inherit;
-  line-height: 1.5;
-}
+.field-textarea { resize: none; font-family: inherit; line-height: 1.5; }
 
 .field-count {
   position: absolute;
@@ -330,7 +312,6 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-/* ── Mensajes ───────────────────────────────────────────────── */
 .success-msg {
   color: var(--accent);
   font-size: 0.9rem;
@@ -351,13 +332,8 @@ onMounted(() => {
   margin-top: 8px;
 }
 
-/* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .edit-form-wrap {
-    padding: 0 16px;
-  }
-  .edit-avatar-wrap {
-    padding: 0 16px;
-  }
+  .edit-form-wrap { padding: 0 16px; }
+  .edit-avatar-wrap { padding: 0 16px; }
 }
 </style>

@@ -21,9 +21,9 @@ $routes->post('forgot-password', 'AuthController::forgotPassword');
 $routes->put('profile', 'AuthController::updateProfile');
 
 // Responder peticiones preflight (OPTIONS) para cualquier ruta
+$routes->put('profile', 'AuthController::updateProfile');
 $routes->options('(:any)', static function () {
-	$res = service('response');
-	return $res->setStatusCode(200);
+    return service('response')->setStatusCode(200);
 });
 
 //POST: este indica que la ruta recibira datos (el email y la clave) de forma segura

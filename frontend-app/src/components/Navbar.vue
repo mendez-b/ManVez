@@ -75,7 +75,7 @@
       </div>
 
       <!-- Switch de tema -->
-      <button class="theme-btn" :class="{ 'theme-btn--hidden': searchOpen }" @click="toggleTheme">
+      <button class="theme-btn" @click="toggleTheme">
         <Sun v-if="!isDark" :size="18" />
         <Moon v-else :size="18" />
       </button>
@@ -143,6 +143,7 @@ const userData    = ref(null)
 
 const avatarUrl = computed(() => {
   if (userData.value?.avatar) return userData.value.avatar
+  if (userData.value?.profile_pic_url) return userData.value.profile_pic_url
   const name = userData.value?.username || 'U'
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1AAD4B&color=fff&size=64`
 })
@@ -573,16 +574,10 @@ onUnmounted(() => {
 
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
-    .avatar-menu {
-    display: none;
-  }
   .nav-links,
   .login-btn,
   .search-bar--desktop {
     display: none;
-    .theme-btn--hidden {
-      display: none !important;
-    }
   }
 
   .search-wrap {
