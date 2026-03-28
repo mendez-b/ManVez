@@ -128,11 +128,11 @@ async function saveProfile() {
     if (newAvatar.value) body.avatar = newAvatar.value
     if (newBanner.value) body.banner = newBanner.value
 
-    const response = await fetch(`${API}/profile`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    })
+   const response = await fetch(`${API}/profile`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
 
     if (response.ok) {
       const data = await response.json()
