@@ -124,13 +124,11 @@ class AuthController extends ResourceController
         }
     }
 
-    public function updateProfile()
-    {
-        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-        $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
-        if (in_array($origin, $allowed)) {
-            header("Access-Control-Allow-Origin: $origin");
-        }
+   public function updateProfile()
+{
+    error_log("updateProfile llamado - método: " . $_SERVER['REQUEST_METHOD']);
+    return $this->response->setJSON(['debug' => 'llegó al método', 'method' => $_SERVER['REQUEST_METHOD']]);
+    // ... resto del código
         header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
         header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS, DELETE");
 
