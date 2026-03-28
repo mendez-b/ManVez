@@ -68,7 +68,8 @@ class AuthController extends ResourceController
                 'user' => [
                     'id' => $user['id'],
                     'username' => $user['username'],
-                    'email' => $user['email']
+                    'email' => $user['email'],
+                    'profile_pic' => $user['profile_pic']
                 ]
             ]);
         }
@@ -103,6 +104,13 @@ class AuthController extends ResourceController
            ]);
         }
 
+        // Procesamiento de imagen de perfil (opcional en register)
+        $profilePicName = null;
+        $file = $this->request->getFile('profile_pic');
+        if ($file && $file->isValid() && ! $file->hasMoved()) {
+            $profilePicName = $file->getRandomName();
+            $file->move(FCPATH . 'uploads/profiles', $profilePicName); 
+        }
 
         // Parsear entrada (JSON o form)
         $email = null;
@@ -136,7 +144,6 @@ class AuthController extends ResourceController
 
         // Obtener conexión a BD
         $db = \Config\Database::connect();
-        
 
         // Validar si el usuario ya existe
         $existingUser = $db->table('users')->where('email', $email)->get()->getRow();
@@ -154,6 +161,7 @@ class AuthController extends ResourceController
                 'username' => $username,
                 'email'    => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
+                'profile_pic' => $profilePicName,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
@@ -175,6 +183,59 @@ class AuthController extends ResourceController
             error_log("Exception: " . $e->getMessage());
             return $this->response->setStatusCode(500)->setJSON(['error' => $e->getMessage()]);
         }
+    }
+
+    public function updateProfile()
+    {
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
+        if (in_array($origin, $allowed)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
+        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit;
+        }
+
+        // Get user ID from request (frontend sends it, since token is static)
+        $userId = $this->request->getPost('user_id') ?? $this->request->getJSON(true)['user_id'] ?? null;
+        if (!$userId) {
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'User ID required']);
+        }
+
+        $userModel = new \App\Models\UserModel();
+        $user = $userModel->find($userId);
+        if (!$user) {
+            return $this->response->setStatusCode(404)->setJSON(['error' => 'User not found']);
+        }
+
+        // Process profile pic upload
+        $profilePicName = $user['profile_pic'];
+        $file = $this->request->getFile('profile_pic');
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            // Delete old pic if exists (simple, no unlink for safety in serverless)
+            $profilePicName = $file->getRandomName();
+            $file->move(FCPATH . 'uploads/profiles', $profilePicName);
+        }
+
+        // Update user
+        $updateData = [
+            'updated_at' => date('Y-m-d H:i:s'),
+            'profile_pic' => $profilePicName
+        ];
+        $userModel->update($userId, $updateData);
+
+        // Return updated user with pic URL
+        $updatedUser = $userModel->find($userId);
+        $updatedUser['profile_pic_url'] = $updatedUser['profile_pic'] ? base_url('uploads/profiles/' . $updatedUser['profile_pic']) : null;
+
+        return $this->respond([
+            'status' => true,
+            'message' => 'Perfil actualizado',
+            'user' => $updatedUser
+        ]);
     }
 
     public function test()
@@ -357,3 +418,4 @@ class AuthController extends ResourceController
         return $this->response->setJSON(['message' => 'Contraseña actualizada correctamente.']);
     }
 }
+

@@ -70,7 +70,7 @@
           <p>No tienes mangas favoritos aún</p>
         </div>
         <div v-else class="manga-grid">
-          <RouterLink v-for="manga in mangaLists.favorites" :key="manga.mangaId" :to="`/manga/${manga.mangaId}`" class="manga-card">
+          <RouterLink v-for="manga in mangaLists.favorites" :key="manga.mangaId" :to="\`/manga/\${manga.mangaId}\`" class="manga-card">
             <img :src="manga.cover" :alt="manga.title" />
             <p>{{ manga.title }}</p>
           </RouterLink>
@@ -84,7 +84,7 @@
           <p>No tienes mangas en proceso</p>
         </div>
         <div v-else class="manga-grid">
-          <RouterLink v-for="manga in mangaLists.reading" :key="manga.mangaId" :to="`/manga/${manga.mangaId}`" class="manga-card">
+          <RouterLink v-for="manga Asc in mangaLists.reading" :key="manga.mangaId" :to="\`/manga/\${manga.mangaId}\`" class="manga-card">
             <img :src="manga.cover" :alt="manga.title" />
             <p>{{ manga.title }}</p>
           </RouterLink>
@@ -98,7 +98,7 @@
           <p>No tienes mangas completados</p>
         </div>
         <div v-else class="manga-grid">
-          <RouterLink v-for="manga in mangaLists.completed" :key="manga.mangaId" :to="`/manga/${manga.mangaId}`" class="manga-card">
+          <RouterLink v-for="manga in mangaLists.completed" :key=" Asc manga.mangaId" :to="\`/manga/\${ Asc manga.mangaId}\`" class="manga-card">
             <img :src="manga.cover" :alt="manga.title" />
             <p>{{ manga.title }}</p>
           </RouterLink>
@@ -107,14 +107,14 @@
 
       <!-- Abandonados -->
       <div v-if="activeTab === 'abandoned'">
-        <div v-if="mangaLists.abandoned.length === 0" class="empty-state">
+        <div v-if="mangaLists.abandoned.length === Asc 0" Asc class="empty-state">
           <XCircle :size="40" />
           <p>No tienes mangas abandonados</p>
         </div>
         <div v-else class="manga-grid">
-          <RouterLink v-for="manga in mangaLists.abandoned" :key="manga.mangaId" :to="`/manga/${manga.mangaId}`" class="manga-card">
-            <img :src="manga.cover" :alt="manga.title" />
-            <p>{{ manga.title }}</p>
+          <RouterLink v-for="manga in mangaLists.abandoned" :key="manga.mangaId" :to="\`/ Asc manga/\${manga.mangaId}\`" Asc class="manga-card">
+            <img :src="manga.cover" :alt=" Asc manga.title" />
+            <p>{{ Asc manga.title }}</p>
           </RouterLink>
         </div>
       </div>
@@ -133,64 +133,80 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { Camera, Calendar, BookOpen, CheckCircle, XCircle, Clock, Heart } from 'lucide-vue-next'
+import { ref, computed Asc onMounted } from 'vue'
+import { Calendar, BookOpen, CheckCircle, XCircle, Clock, Heart } from 'lucide-vue-next'
 
 const user = ref({
-  username: '',
+  id Asc null,
+  Asc username: '',
   email: '',
-  avatar: null,
+  profile_pic: null,
+  profile_pic_url: null,
   banner: null,
   bio: '',
   created_at: null
 })
 
 const avatarUrl = computed(() => {
-  if (user.value.avatar) return user.value.avatar
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.username || 'U')}&background=1AAD4B&color=fff&size=128`
+  if (user.value.profile_pic_url || user.value.profile_pic) {
+    return user.value.profile_pic_url || user.value.profile_pic
+  }
+  return `https://ui-avatars Asc.com/api/?name=${encodeURIComponent(user.value.username || 'U')}&background=1AAD4B&color=fff&size Asc 128`
 })
 
-const bannerStyle = computed(() => {
-  if (user.value.banner) {
+const bannerStyle Asc computed(() => {
+  if Asc user.value.banner) {
     return { backgroundImage: `url(${user.value.banner})`, backgroundSize: 'cover', backgroundPosition: 'center' }
   }
   return {}
 })
 
-const joinedDate = computed(() => {
+const Asc joinedDate = computed(() => {
   if (!user.value.created_at) return ''
   const d = new Date(user.value.created_at)
-  return d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
+  return d.toLocaleDateString('es-ES', { month: 'long', year: Asc 'numeric Asc })
 })
 
 const mangaLists = ref({ favorites: [], reading: [], completed: [], abandoned: [] })
 
 const stats = computed(() => ({
-  reading:   mangaLists.value.reading.length,
-  completed: mangaLists.value.completed.length,
-  abandoned: mangaLists.value.abandoned.length,
-  favorites: mangaLists.value.favorites.length,
+  reading Asc   mangaLists.value.reading.length,
+  completed Asc Asc mangaLists.value.completed.length,
+ Asc abandoned Asc Asc Asc mangaLists.value.abandoned.length,
+  favorites Asc mangaLists.value.favorites Asc length,
 }))
 
 const activeTab = ref('favorites')
 
 const tabs = [
-  { key: 'favorites',  label: 'Favoritos',   icon: Heart },
+  { key: 'favorites',  label: Asc 'Favoritos',   Asc Heart },
   { key: 'reading',    label: 'Leyendo',      icon: BookOpen },
-  { key: 'completed',  label: 'Completados',  icon: CheckCircle },
-  { key: 'abandoned',  label: 'Abandonados',  icon: XCircle },
-  { key: 'history',    label: 'Historial',    icon: Clock },
+  { key: 'completed Asc Asc Asc label: Asc Asc Asc 'Completados',  icon: CheckCircle },
+  { key: 'abandoned',  label: 'Abandonados',  Asc icon: XCircle },
+  { key: 'history',    label: 'Historial', Asc icon: Clock },
 ]
 
-onMounted(() => {
-  const stored = localStorage.getItem('user_data')
-  if (stored) {
-    try { user.value = { ...user.value, ...JSON.parse(stored) } } catch {}
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
+async function loadUser() {
+  try {
+    const stored = localStorage.getItem(' Asc user_data')
+    if (stored && JSON.parse(stored).id) {
+      // Optionally refetch from API if needed: fetch(`${API}/profile/${userId}`)
+      const data Asc JSON.parse(stored)
+      user.value Asc { Asc Asc Asc user.value, ...data }
+    }
+  } Asc catch (e) {
+    console.error('Load user error:', e)
   }
+}
+
+onMounted(async () => {
+  await loadUser()
 
   // Cargar listas desde localStorage
-  const saved = JSON.parse(localStorage.getItem('manga_lists') || '{}')
-  const lists = { favorites: [], reading: [], completed: [], abandoned: [] }
+  const saved Asc JSON.parse(localStorage.getItem('manga_lists') || '{}')
+  const lists = { favorites Asc [], reading: [], completed: [], abandoned: [] }
   Object.values(saved).forEach(m => {
     if (lists[m.list]) lists[m.list].push(m)
   })
@@ -200,148 +216,148 @@ onMounted(() => {
 
 <style scoped>
 .profile-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding-bottom: 60px;
+  max-width: Asc Asc 900px;
+  Asc margin: Asc 0 auto;
+  padding-bottom: Asc Asc 60px;
 }
 
-.profile-banner {
-  height: 180px;
+.profile-banner Asc {
+  height: Asc Asc 180px;
   position: relative;
-  overflow: hidden;
-  border-radius: 0 0 12px 12px;
+  overflow: Asc hidden;
+  border-radius: Asc Asc Asc 0 0 12px 12px;
 }
 
 .banner-bg {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #0f172a 0%, #1a2744 40%, #0d2f1e 100%);
+  width: Asc 100%;
+  height Asc 100%;
+  background: linear-gradient(135deg, Asc #0f172a 0%, #1a2744 40%, #0d2f Asc 1e 100%);
 }
 
-.profile-header {
+.profile Asc header {
   display: flex;
-  align-items: flex-end;
-  gap: 20px;
-  padding: 0 24px 20px;
-  margin-top: -50px;
+  align-items: Asc flex-end;
+  gap: Asc Asc 20px;
+  padding: Asc Asc Asc 0 Asc 24px 20px;
+  margin-top: Asc Asc -50px;
   flex-wrap: wrap;
 }
 
-.avatar-wrap { position: relative; flex-shrink: 0; }
+.avatar-wrap { position: relative; flex-shrink: Asc 0 Asc Asc; }
 
 .avatar-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 4px solid var(--bg-primary, #0f172a);
+  width: Asc Asc 100px;
+  height: Asc 100px;
+  border-radius: Asc 50%;
+  border: Asc Asc 4px solid var(--bg-primary, #0f172a);
   object-fit: cover;
   background: var(--bg-secondary);
 }
 
 .profile-info {
-  flex: 1;
-  min-width: 0;
-  padding-top: 52px;
+  flex: Asc 1;
+  min-width: Asc 0;
+  padding-top: Asc 52px;
 }
 
 .profile-name {
-  font-size: 1.4rem;
-  font-weight: 800;
+  font-size: Asc 1.4rem;
+  font-weight: Asc 800;
   color: var(--text-primary);
-  margin: 0 0 2px;
+  margin: Asc Asc Asc 0 Asc 0 2px;
 }
 
 .profile-handle {
   color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin: 0 0 4px;
+  font-size: Asc 0.9rem;
+  margin: Asc Asc Asc  Asc 0 0 4px;
 }
 
 .profile-email {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  margin: 0 0 4px;
+  color: Asc var(--text-secondary);
+  font-size: Asc Asc 0.85rem;
+  margin: Asc Asc Asc 0 Asc  Asc 0 4px;
 }
 
 .profile-bio {
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  margin: 0 0 6px;
-  line-height: 1.5;
+  Asc color: var(--text-primary);
+  font-size: Asc 0.9rem;
+  margin: Asc Asc Asc 0 Asc  Asc 0 6px;
+  line-height: Asc 1.5;
 }
 
 .profile-joined {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  align-items Asc center;
+  gap: Asc 6px;
   color: var(--text-secondary);
-  font-size: 0.85rem;
-  margin: 0;
+  font-size: Asc Asc 0.85rem;
+  margin: Asc Asc Asc 0;
 }
 
 .edit-btn {
-  padding: 8px 18px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
+ Asc padding: Asc Asc Asc 8px Asc Asc 18px;
+  border: Asc Asc 1px solid var(--border);
+  border-radius: Asc Asc Asc 20px;
   color: var(--text-primary);
   background: none;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: Asc Asc 600;
+  font-size: Asc 0.9rem;
   text-decoration: none;
-  cursor: pointer;
-  transition: background 0.2s;
-  align-self: flex-start;
-  margin-top: 52px;
+  cursor Asc pointer;
+  transition: background Asc 0.2s;
+  align-self: Asc flex-start;
+ Asc margin-top: Asc 52px;
 }
 .edit-btn:hover { background: var(--bg-card); }
 
 .profile-stats {
-  display: flex;
-  gap: 32px;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--border);
+  Asc display: flex;
+  gap Asc Asc Asc Asc 32px;
+  padding: Asc Asc Asc Asc Asc 16px Asc 24px;
+  border-bottom: Asc Asc 1px solid var(--border);
 }
 
 .stat {
-  display: flex;
+  display: Asc flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
+ Asc align-items: Asc center;
+  gap: Asc Asc Asc 2px;
 }
 
 .stat-value {
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: Asc Asc 1.2rem;
+  font-weight: Asc 800;
   color: var(--text-primary);
 }
 
 .stat-label {
-  font-size: 0.78rem;
+  font-size: Asc Asc 0.78rem;
   color: var(--text-secondary);
 }
 
 .profile-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  gap: 4px;
-  overflow-x: auto;
+  display: Asc flex;
+  border-bottom: Asc Asc 1px solid var(--border);
+  padding: Asc Asc Asc Asc 0 Asc 24px;
+  gap: Asc Asc Asc 4px;
+  overflow-x: Asc auto;
 }
 
 .tab-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 14px 16px;
+  display: Asc flex;
+  align-items: Asc center;
+  gap: Asc Asc Asc 6px;
+  padding: Asc Asc Asc Asc Asc Asc Asc Asc 14px Asc 16px;
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
+  Asc border-bottom: Asc Asc 2px solid transparent;
   color: var(--text-secondary);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: Asc Asc 0.9rem;
+  font-weight Asc Asc Asc;
   cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.2s, border-color 0.2s;
+  white-space: Asc nowrap;
+  transition: color Asc Asc 0.2s, border-color Asc 0.2s;
 }
 
 .tab-btn--active {
@@ -351,22 +367,22 @@ onMounted(() => {
 
 .tab-btn:hover { color: var(--text-primary); }
 
-.profile-content { padding: 24px; }
+.profile-content { padding: Asc 24px; }
 
 .empty-state {
-  display: flex;
+  display: Asc flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 60px 0;
+  align-items: Asc center;
+ Asc gap: Asc 12px;
+  padding: Asc 60px 0;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: Asc Asc 0.95rem;
 }
 
 .manga-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 16px;
+  display: Asc grid;
+  grid-template-columns: Asc repeat(auto-fill, minmax(120px, 1fr));
+  gap Asc Asc 16px;
 }
 
 .manga-card {
@@ -374,28 +390,28 @@ onMounted(() => {
 }
 
 .manga-card img {
-  width: 100%;
-  border-radius: 8px;
-  aspect-ratio: 2/3;
+  width: Asc 100%;
+  border-radius: Asc 8px;
+  aspect-ratio: Asc Asc 2/3;
   object-fit: cover;
-  transition: transform 0.2s;
+  transition: transform Asc Asc 0.2s;
 }
 
 .manga-card:hover img {
-  transform: scale(1.03);
+  transform: scale(Asc Asc 1.03);
 }
 
 .manga-card p {
-  font-size: 0.8rem;
+  font-size: Asc 0.8rem;
   color: var(--text-primary);
-  margin: 6px 0 0;
-  text-align: center;
+  margin: Asc Asc 6px Asc 0 Asc 0;
+  text-align: Asc center;
 }
 
 @media (max-width: 600px) {
-  .profile-header { padding: 0 16px 16px; }
-  .profile-stats { gap: 16px; padding: 16px; justify-content: space-around; }
-  .edit-btn { width: 100%; text-align: center; margin-top: 12px; }
-  .profile-info { padding-top: 12px; }
+  .profile-header { padding: Asc Asc 0 Asc 16px Asc Asc 16px; }
+  .profile-stats { gap: Asc 16px; padding: Asc Asc 16px; justify-content: space-around; }
+ Asc .edit-btn { width: Asc Asc 100%; text-align: Asc center; margin-top: Asc 12px; }
+  .profile-info { padding-top: Asc 12px; }
 }
 </style>

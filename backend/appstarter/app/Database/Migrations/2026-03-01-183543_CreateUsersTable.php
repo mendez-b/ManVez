@@ -30,6 +30,11 @@ class CreateUsersTable extends Migration
                 'constraint' => '255',
                 'null'       => false,
             ],
+            'profile_pic' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '500',
+                'null'       => true,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -42,6 +47,18 @@ class CreateUsersTable extends Migration
         $this->forge->addKey('id', true);
         $this->forge->addUniqueKey('email');
         $this->forge->createTable('users');
+        
+        // Idempotent ALTER for existing tables (safe for Render deploy)
+        if (!$this->db->fieldExists('users', 'profile_pic')) {
+            $this->forge->addColumn('users', [
+                'profile_pic' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => '500',
+                    'null'       => true,
+                    'after'      => 'password'
+                ]
+            ]);
+        }
     }
 
     public function down()

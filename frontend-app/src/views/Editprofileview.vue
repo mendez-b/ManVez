@@ -16,7 +16,7 @@
         <img :src="previewAvatar" alt="Avatar" class="edit-avatar" />
         <label class="avatar-edit-btn" title="Cambiar foto">
           <Camera :size="16" />
-          <input type="file" accept="image/*" @change="onAvatarChange" hidden />
+          <input type="file" accept="image/*" @change="onAvatarChange" hidden ref="avatarInput" />
         </label>
       </div>
     </div>
@@ -77,13 +77,14 @@ const saving  = ref(false)
 const successMsg = ref('')
 const errorMsg   = ref('')
 
+const avatarFile = ref(null)
+const previewAvatar  = ref('')
+const previewBanner  = ref('')
+
 const form = ref({
   username: '',
   bio: ''
 })
-
-const previewAvatar  = ref('')
-const previewBanner  = ref('')
 
 const bannerStyle = computed(() => {
   if (previewBanner.value) {
@@ -92,9 +93,12 @@ const bannerStyle = computed(() => {
   return {}
 })
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 function onAvatarChange(e) {
   const file = e.target.files[0]
   if (!file) return
+  avatarFile.value = file
   const reader = new FileReader()
   reader.onload = (ev) => { previewAvatar.value = ev.target.result }
   reader.readAsDataURL(file)
@@ -108,24 +112,35 @@ function onBannerChange(e) {
   reader.readAsDataURL(file)
 }
 
-function saveProfile() {
+async function saveProfile() {
   saving.value = true
   errorMsg.value = ''
 
   try {
     const stored = JSON.parse(localStorage.getItem('user_data') || '{}')
-    const updated = {
-      ...stored,
-      username: form.value.username,
-      bio: form.value.bio,
-      avatar: previewAvatar.value || stored.avatar,
-      banner: previewBanner.value || stored.banner
+    
+    const formData = new FormData()
+    formData.append('user_id', stored.id)
+    if (avatarFile.value) {
+      formData.append('profile_pic', avatarFile.value)
     }
-    localStorage.setItem('user_data', JSON.stringify(updated))
-    successMsg.value = '¡Perfil actualizado!'
-    setTimeout(() => router.push('/profile'), 1200)
-  } catch {
-    errorMsg.value = 'Error al guardar.'
+
+    const response = await fetch(`${API}/profile`, {
+      method: 'PUT',
+      body: formData
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      localStorage.setItem('user_data', JSON.stringify(data.user))
+      successMsg.value = '¡Perfil actualizado!'
+      setTimeout(() => router.push('/profile'), 1200)
+    } else {
+      errorMsg.value = 'Error al actualizar perfil.'
+    }
+  } catch (err) {
+    console.error(err)
+    errorMsg.value = 'Error de conexión.'
   } finally {
     saving.value = false
   }
@@ -137,7 +152,7 @@ onMounted(() => {
     const data = JSON.parse(stored)
     form.value.username = data.username || ''
     form.value.bio      = data.bio || ''
-    previewAvatar.value = data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || 'U')}&background=1AAD4B&color=fff&size=128`
+    previewAvatar.value = data.profile_pic_url || data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || 'U')}&background=1AAD4B&color=fff&size=128`
     previewBanner.value = data.banner || ''
   }
 })

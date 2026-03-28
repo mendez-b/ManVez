@@ -18,6 +18,7 @@ $routes->post('login', 'AuthController::login');
 $routes->post('register', 'AuthController::register');
 //aqui se define la ruta para el reseteo de contraseña
 $routes->post('forgot-password', 'AuthController::forgotPassword');
+$routes->put('profile', 'AuthController::updateProfile');
 
 // Responder peticiones preflight (OPTIONS) para cualquier ruta
 $routes->options('(:any)', static function () {
