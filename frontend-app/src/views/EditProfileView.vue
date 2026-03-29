@@ -113,8 +113,19 @@ async function onBannerChange(e) {
   newBanner.value = b64
 }
 
-async function saveProfile() {
+() {
   saving.value  = true
+  errorMsg.value = ''
+
+  try {
+    const stored = JSON.parse(localStorage.getItem('user_data') || '{}')
+
+    const body = {
+      user_id:  stored.id,
+      username: form.value.username,
+      bio:      form.value.bio,
+    async function saveProfile() {
+  saving.value   = true
   errorMsg.value = ''
 
   try {
@@ -128,24 +139,24 @@ async function saveProfile() {
     if (newAvatar.value) body.avatar = newAvatar.value
     if (newBanner.value) body.banner = newBanner.value
 
-  const response = await fetch(`${API}/profile`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  })
+    const response = await fetch(`${API}/profile`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
 
-  const text = await response.text()
-console.log('Response:', text)
+    const text = await response.text()
+    console.log('Response status:', response.status)
+    console.log('Response body:', text)
 
     if (response.ok) {
-      const data = await response.json()
+      const data = JSON.parse(text)
       localStorage.setItem('user_data', JSON.stringify(data.user))
-      window.dispatchEvent(new Event('user-login')) // actualizar navbar
+      window.dispatchEvent(new Event('user-login'))
       successMsg.value = '¡Perfil actualizado!'
       setTimeout(() => router.push('/profile'), 1200)
     } else {
-      const err = await response.json()
-      errorMsg.value = err.error || 'Error al actualizar perfil.'
+      errorMsg.value = 'Error: ' + text
     }
   } catch (err) {
     console.error(err)
