@@ -104,6 +104,10 @@
           <BookOpen :size="20" />
           Mangas
         </RouterLink>
+        <RouterLink v-if="!isLoggedIn" to="/login" class="side-menu__item" @click="closeMenu">
+          <User :size="20" />
+          Iniciar sesión
+        </RouterLink>
       </nav>
     </div>
   </nav>
