@@ -180,10 +180,10 @@ async function loadChapter() {
     } else {
       pages.value = []
     }
+    saveToHistory() // ← aquí, dentro del try
   } catch (err) {
     console.error("Error al cargar las páginas del capítulo:", err)
     pages.value = []
-    saveToHistory()
   } finally {
     loading.value = false
   }
