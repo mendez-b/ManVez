@@ -128,7 +128,7 @@ function saveToHistory() {
     chapterId: currentChapter.value,
     title: chapters.value.find(c => c.id === currentChapter.value)?.attributes?.title || '',
     chapter: chapters.value.find(c => c.id === currentChapter.value)?.attributes?.chapter || '?',
-    cover: `https://uploads.mangadex.org/covers/${mangaId}/${mangaId}.512.jpg`,
+    cover: JSON.parse(localStorage.getItem('manga_lists') || '{}')?.[mangaId]?.cover || '',
     readAt: new Date().toISOString()
   }
 
