@@ -128,7 +128,7 @@ async function saveToHistory() {
     const coverRel = res.data.data.relationships?.find(r => r.type === 'cover_art')
     console.log('coverRel:', coverRel)
     if (coverRel?.attributes?.fileName) {
-      cover = `https://uploads.mangadex.org/covers/${mangaId}/${coverRel.attributes.fileName}.512.jpg`
+     cover = 'https://uploads.mangadex.org/covers/' + mangaId + '/' + coverRel.attributes.fileName + '.512.jpg'
   } catch (e) {}
 
   const entry = {
