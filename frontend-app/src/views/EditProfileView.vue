@@ -113,8 +113,8 @@ async function saveProfile() {
       bio:      form.value.bio,
     }
 
-    if (avatarBase64.value) {
-      payload.profile_pic = avatarBase64.value
+    if (newAvatar.value) {
+      payload.profile_pic = newAvatar.value
     }
 
     const response = await fetch(`${API}/profile`, {
