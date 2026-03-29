@@ -45,12 +45,12 @@ class AuthController extends ResourceController
                 'token'   => 'mi-token-secreto-123',
                 'message' => '¡Bienvenido!',
                 'user'    => [
-                    'id'       => $user['id'],
-                    'username' => $user['username'],
-                    'email'    => $user['email'],
-                    'avatar'   => $user['avatar'] ?? null,
-                    'banner'   => $user['banner'] ?? null,
-                    'bio'      => $user['bio'] ?? null,
+                    'id'         => $user['id'],
+                    'username'   => $user['username'],
+                    'email'      => $user['email'],
+                    'avatar'     => $user['avatar'] ?? null,
+                    'banner'     => $user['banner'] ?? null,
+                    'bio'        => $user['bio'] ?? null,
                     'created_at' => $user['created_at'] ?? null,
                 ]
             ]);
@@ -124,29 +124,30 @@ class AuthController extends ResourceController
         }
     }
 
-   public function updateProfile()
-{
-    error_log("updateProfile llamado - método: " . $_SERVER['REQUEST_METHOD']);
-    return $this->response->setJSON(['debug' => 'llegó al método', 'method' => $_SERVER['REQUEST_METHOD']]);
-    // ... resto del código
+    public function updateProfile()
+    {
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
+        if (in_array($origin, $allowed)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
         header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
         header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS, DELETE");
 
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
 
-        $json = $this->request->getJSON(true);
-
-        $userId  = $json['user_id']  ?? null;
+        $json     = $this->request->getJSON(true);
+        $userId   = $json['user_id']  ?? null;
         $username = $json['username'] ?? null;
-        $bio     = $json['bio']      ?? null;
-        $avatar  = $json['avatar']   ?? null; // base64
-        $banner  = $json['banner']   ?? null; // base64
+        $bio      = $json['bio']      ?? null;
+        $avatar   = $json['avatar']   ?? null;
+        $banner   = $json['banner']   ?? null;
 
         if (!$userId) {
             return $this->response->setStatusCode(400)->setJSON(['error' => 'User ID requerido']);
         }
 
-        $db = \Config\Database::connect();
+        $db   = \Config\Database::connect();
         $user = $db->table('users')->where('id', $userId)->get()->getRow();
         if (!$user) {
             return $this->response->setStatusCode(404)->setJSON(['error' => 'Usuario no encontrado']);
@@ -166,12 +167,12 @@ class AuthController extends ResourceController
             'status'  => true,
             'message' => 'Perfil actualizado',
             'user'    => [
-                'id'       => $updated['id'],
-                'username' => $updated['username'],
-                'email'    => $updated['email'],
-                'avatar'   => $updated['avatar'] ?? null,
-                'banner'   => $updated['banner'] ?? null,
-                'bio'      => $updated['bio']    ?? null,
+                'id'         => $updated['id'],
+                'username'   => $updated['username'],
+                'email'      => $updated['email'],
+                'avatar'     => $updated['avatar']     ?? null,
+                'banner'     => $updated['banner']     ?? null,
+                'bio'        => $updated['bio']        ?? null,
                 'created_at' => $updated['created_at'] ?? null,
             ]
         ]);
