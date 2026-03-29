@@ -116,28 +116,35 @@ const currentIndex = computed(() =>
 const hasPrev = computed(() => currentIndex.value < chapters.value.length - 1) // hay capítulo más antiguo
 const hasNext = computed(() => currentIndex.value > 0) // hay capítulo más nuevo
 
-function saveToHistory() {
+async function saveToHistory() {
   const mangaId = route.params.mangaId
   const history = JSON.parse(localStorage.getItem('reading_history') || '[]')
-  
-  // Buscar si ya existe este manga en el historial
   const existingIndex = history.findIndex(h => h.mangaId === mangaId)
-  
+
+  // Obtener portada desde la API
+  let cover = ''
+  try {
+    const res = await axios.get(`${BASE}/manga/${mangaId}?includes[]=cover_art`)
+    const coverRel = res.data.data.relationships?.find(r => r.type === 'cover_art')
+    if (coverRel?.attributes?.fileName) {
+      cover = `https://uploads.mangadex.org/covers/${mangaId}/${coverRel.attributes.fileName}.512.jpg`
+    }
+  } catch {}
+
   const entry = {
     mangaId,
     chapterId: currentChapter.value,
     title: chapters.value.find(c => c.id === currentChapter.value)?.attributes?.title || '',
     chapter: chapters.value.find(c => c.id === currentChapter.value)?.attributes?.chapter || '?',
-    cover: JSON.parse(localStorage.getItem('manga_lists') || '{}')?.[mangaId]?.cover || '',
+    cover,
     readAt: new Date().toISOString()
   }
 
-  if (existingIndex !== -1) {
-    history.splice(existingIndex, 1)
-  }
-  history.unshift(entry) // Agregar al inicio
-  localStorage.setItem('reading_history', JSON.stringify(history.slice(0, 50))) // Máximo 50
+  if (existingIndex !== -1) history.splice(existingIndex, 1)
+  history.unshift(entry)
+  localStorage.setItem('reading_history', JSON.stringify(history.slice(0, 50)))
 }
+
 async function loadChapters() {
   try {
     const res = await axios.get(
@@ -180,7 +187,7 @@ async function loadChapter() {
     } else {
       pages.value = []
     }
-    saveToHistory() // ← aquí, dentro del try
+     await saveToHistory() // ← aquí, dentro del try
   } catch (err) {
     console.error("Error al cargar las páginas del capítulo:", err)
     pages.value = []
