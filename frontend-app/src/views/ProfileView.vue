@@ -110,27 +110,13 @@
         </div>
       </div>
 
-      <!-- Historial -->
-      <div v-if="activeTab === 'history'">
-        <div v-if="history.length === 0" class="empty-state">
-           <Clock :size="40" />
-           <p>Tu historial de lectura está vacío</p>
-         </div>
-         <div v-else class="manga-grid">
-           <RouterLink v-for="item in history" :key="item.mangaId" :to="`/manga/${item.mangaId}`" class="manga-card">
-            <img :src="item.cover" :alt="item.title" />
-            <p>Cap. {{ item.chapter }}</p>
-         </RouterLink>
-       </div>
-     </div>
-
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Calendar, BookOpen, CheckCircle, XCircle, Clock, Heart } from 'lucide-vue-next'
+import { Calendar, BookOpen, CheckCircle, XCircle, Heart } from 'lucide-vue-next'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 const history = ref([])
@@ -175,7 +161,6 @@ const tabs = [
   { key: 'reading',   label: 'Leyendo',      icon: BookOpen },
   { key: 'completed', label: 'Completados',  icon: CheckCircle },
   { key: 'abandoned', label: 'Abandonados',  icon: XCircle },
-  { key: 'history',   label: 'Historial',    icon: Clock },
 ]
 
 async function loadUser() {
