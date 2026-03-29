@@ -186,26 +186,6 @@ async function loadUser() {
 }
 
 async function loadLists() {
-  // Si hay sesión, cargar desde BD
-  if (user.value.id) {
-    try {
-      const res  = await fetch(`${API}/manga-list?user_id=${user.value.id}`)
-      const data = await res.json()
-      if (data.status && data.lists) {
-        mangaLists.value = {
-          favorites: data.lists.favorites || [],
-          reading:   data.lists.reading   || [],
-          completed: data.lists.completed || [],
-          abandoned: data.lists.abandoned || [],
-        }
-        return
-      }
-    } catch (err) {
-      console.error('Error cargando listas desde BD:', err)
-    }
-  }
-
-  // Fallback: localStorage
   const saved = JSON.parse(localStorage.getItem('manga_lists') || '{}')
   const lists = { favorites: [], reading: [], completed: [], abandoned: [] }
   Object.values(saved).forEach(m => {
