@@ -88,7 +88,7 @@ import axios from 'axios'
 
 
 const BASE = '/api/mangadex'
-
+const mangaCover = ref('')
 
 
 const route = useRoute()
@@ -126,9 +126,9 @@ async function saveToHistory() {
   try {
     const res = await axios.get(`${BASE}/manga/${mangaId}?includes[]=cover_art`)
     const coverRel = res.data.data.relationships?.find(r => r.type === 'cover_art')
+    console.log('coverRel:', coverRel)
     if (coverRel?.attributes?.fileName) {
       cover = `https://uploads.mangadex.org/covers/${mangaId}/${coverRel.attributes.fileName}.512.jpg`
-    }
   } catch {}
 
   const entry = {
@@ -147,6 +147,13 @@ async function saveToHistory() {
 
 async function loadChapters() {
   try {
+    // Obtener portada del manga
+    const mangaRes = await axios.get(`${BASE}/manga/${route.params.mangaId}?includes[]=cover_art`)
+    const coverRel = mangaRes.data.data.relationships?.find(r => r.type === 'cover_art')
+    if (coverRel?.attributes?.fileName) {
+      mangaCover.value = `https://uploads.mangadex.org/covers/${route.params.mangaId}/${coverRel.attributes.fileName}.512.jpg`
+    }
+
     const res = await axios.get(
       `${BASE}/manga/${route.params.mangaId}/feed?limit=100&translatedLanguage[]=en&translatedLanguage[]=es&order[chapter]=desc`
     )
