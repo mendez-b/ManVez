@@ -148,9 +148,10 @@ const user = ref({
 })
 
 const avatarUrl = computed(() => {
-  if (user.value.profile_pic_url || user.value.profile_pic) {
-    return user.value.profile_pic_url || user.value.profile_pic
-  }
+  // Buscar tanto 'profile_pic' como 'avatar' por compatibilidad
+  const pic = user.value.profile_pic || user.value.avatar
+  if (pic) return pic
+  if (user.value.email) return gravatarUrl(user.value.email, 128)
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.username || 'U')}&background=1AAD4B&color=fff&size=128`
 })
 
@@ -200,16 +201,21 @@ async function loadUser() {
   }
 }
 
-onMounted(async () => {
-  await loadUser()
-
-  const saved = JSON.parse(localStorage.getItem('manga_lists') || '{}')
-  const lists = { favorites: [], reading: [], completed: [], abandoned: [] }
-  Object.values(saved).forEach(m => {
-    if (lists[m.list]) lists[m.list].push(m)
-  })
-  mangaLists.value = lists
-})
+async function loadUser() {
+  try {
+    const stored = localStorage.getItem('user_data')
+    if (stored && JSON.parse(stored).id) {
+      const data = JSON.parse(stored)
+      user.value = { ...user.value, ...data }
+      // Compatibilidad: el backend a veces devuelve 'avatar' en vez de 'profile_pic'
+      if (!user.value.profile_pic && data.avatar) {
+        user.value.profile_pic = data.avatar
+      }
+    }
+  } catch (e) {
+    console.error('Load user error:', e)
+  }
+}
 </script>
 
 <style scoped>
