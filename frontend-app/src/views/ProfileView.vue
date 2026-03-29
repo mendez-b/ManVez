@@ -195,18 +195,6 @@ async function loadUser() {
     if (stored && JSON.parse(stored).id) {
       const data = JSON.parse(stored)
       user.value = { ...user.value, ...data }
-    }
-  } catch (e) {
-    console.error('Load user error:', e)
-  }
-}
-
-async function loadUser() {
-  try {
-    const stored = localStorage.getItem('user_data')
-    if (stored && JSON.parse(stored).id) {
-      const data = JSON.parse(stored)
-      user.value = { ...user.value, ...data }
       // Compatibilidad: el backend a veces devuelve 'avatar' en vez de 'profile_pic'
       if (!user.value.profile_pic && data.avatar) {
         user.value.profile_pic = data.avatar
@@ -216,6 +204,17 @@ async function loadUser() {
     console.error('Load user error:', e)
   }
 }
+
+onMounted(async () => {
+  await loadUser()
+
+  const saved = JSON.parse(localStorage.getItem('manga_lists') || '{}')
+  const lists = { favorites: [], reading: [], completed: [], abandoned: [] }
+  Object.values(saved).forEach(m => {
+    if (lists[m.list]) lists[m.list].push(m)
+  })
+  mangaLists.value = lists
+})
 </script>
 
 <style scoped>
