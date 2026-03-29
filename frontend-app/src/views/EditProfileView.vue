@@ -117,7 +117,7 @@ async function saveProfile() {
       payload.profile_pic = newAvatar.value
     }
 
-    const response = await fetch(`${API}/profile`, {
+    const response = await fetch(`${API}/update-profile`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(payload)
