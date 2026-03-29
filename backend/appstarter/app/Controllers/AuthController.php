@@ -125,59 +125,71 @@ class AuthController extends ResourceController
     }
 
     public function updateProfile()
-    {   
-        return $this->response->setJSON(['message' => 'Llegué al controlador']);
-       /* $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-        $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
-        if (in_array($origin, $allowed)) {
-            header("Access-Control-Allow-Origin: $origin");
-        }
-        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-        header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS, DELETE");
+{
+    // Configuración de CORS (puedes mover esto a Filters.php para no repetirlo)
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
+    if (in_array($origin, $allowed)) {
+        header("Access-Control-Allow-Origin: $origin");
+    }
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS, DELETE");
 
-        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
 
-        $json     = $this->request->getJSON(true);
-        $userId   = $json['user_id']  ?? null;
-        $username = $json['username'] ?? null;
-        $bio      = $json['bio']      ?? null;
-        $avatar   = $json['avatar']   ?? null;
-        $banner   = $json['banner']   ?? null;
+    // Obtenemos los datos del JSON enviado por Vue
+    $json = $this->request->getJSON(true);
+    $userId = $json['user_id'] ?? null;
 
-        if (!$userId) {
-            return $this->response->setStatusCode(400)->setJSON(['error' => 'User ID requerido']);
-        }
+    if (!$userId) {
+        return $this->response->setStatusCode(400)->setJSON(['error' => 'User ID requerido']);
+    }
 
-        $db   = \Config\Database::connect();
-        $user = $db->table('users')->where('id', $userId)->get()->getRow();
-        if (!$user) {
-            return $this->response->setStatusCode(404)->setJSON(['error' => 'Usuario no encontrado']);
-        }
+    $db = \Config\Database::connect();
+    
+    // Verificamos si el usuario existe
+    $user = $db->table('users')->where('id', $userId)->get()->getRow();
+    if (!$user) {
+        return $this->response->setStatusCode(404)->setJSON(['error' => 'Usuario no encontrado']);
+    }
 
-        $updateData = ['updated_at' => date('Y-m-d H:i:s')];
-        if ($username !== null) $updateData['username'] = $username;
-        if ($bio      !== null) $updateData['bio']      = $bio;
-        if ($avatar   !== null) $updateData['avatar']   = $avatar;
-        if ($banner   !== null) $updateData['banner']   = $banner;
+    // Preparamos los datos a actualizar
+    $updateData = ['updated_at' => date('Y-m-d H:i:s')];
+    
+    // Solo agregamos al update si el campo viene en el JSON
+    if (isset($json['username'])) $updateData['username'] = $json['username'];
+    if (isset($json['bio']))      $updateData['bio']      = $json['bio'];
+    if (isset($json['avatar']))   $updateData['avatar']   = $json['avatar'];
+    if (isset($json['banner']))   $updateData['banner']   = $json['banner'];
 
+    try {
+        // Ejecutamos la actualización
         $db->table('users')->where('id', $userId)->update($updateData);
 
-        $updated = $db->table('users')->where('id', $userId)->get()->getRow(ARRAY_A);
+        // OBTENEMOS EL USUARIO ACTUALIZADO (Corregido: getRowArray)
+        $updated = $db->table('users')->where('id', $userId)->get()->getRowArray();
 
         return $this->respond([
             'status'  => true,
-            'message' => 'Perfil actualizado',
+            'message' => 'Perfil actualizado con éxito',
             'user'    => [
                 'id'         => $updated['id'],
                 'username'   => $updated['username'],
                 'email'      => $updated['email'],
-                'avatar'     => $updated['avatar']     ?? null,
-                'banner'     => $updated['banner']     ?? null,
-                'bio'        => $updated['bio']        ?? null,
+                'avatar'     => $updated['avatar']   ?? null,
+                'banner'     => $updated['banner']   ?? null,
+                'bio'        => $updated['bio']      ?? null,
                 'created_at' => $updated['created_at'] ?? null,
             ]
-        ]);/*/
-    } 
+        ]);
+    } catch (\Exception $e) {
+        // Si algo falla en la DB (ej. nombre de usuario duplicado), capturamos el error
+        return $this->response->setStatusCode(500)->setJSON([
+            'error' => 'Error al actualizar la base de datos',
+            'debug' => $e->getMessage()
+        ]);
+    }
+}
 
     public function test()
     {
