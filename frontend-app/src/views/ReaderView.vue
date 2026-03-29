@@ -129,7 +129,7 @@ async function saveToHistory() {
     console.log('coverRel:', coverRel)
     if (coverRel?.attributes?.fileName) {
       cover = `https://uploads.mangadex.org/covers/${mangaId}/${coverRel.attributes.fileName}.512.jpg`
-  } catch {}
+  } catch (e) {}
 
   const entry = {
     mangaId,
