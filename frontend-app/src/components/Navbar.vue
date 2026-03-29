@@ -104,27 +104,6 @@
           <BookOpen :size="20" />
           Mangas
         </RouterLink>
-        <RouterLink to="/favorites" class="side-menu__item" @click="closeMenu">
-          <Bookmark :size="20" />
-          Favoritos
-        </RouterLink>
-        <RouterLink v-if="isLoggedIn" to="/profile" class="side-menu__item" @click="closeMenu">
-          <User :size="20" />
-          Mi perfil
-        </RouterLink>
-        <RouterLink v-if="!isLoggedIn" to="/login" class="side-menu__item" @click="closeMenu">
-          <User :size="20" />
-          Iniciar sesión
-        </RouterLink>
-        <button v-else class="side-menu__item side-menu__item--btn" @click="handleLogout; closeMenu()">
-          <LogOut :size="20" />
-          Cerrar sesión
-        </button>
-        <button class="side-menu__item side-menu__item--btn" @click="toggleTheme; closeMenu()">
-        <Sun v-if="!isDark" :size="20" />
-          <Moon v-else :size="20" />
-          {{ isDark ? 'Modo claro' : 'Modo oscuro' }}
-        </button>
       </nav>
     </div>
   </nav>
