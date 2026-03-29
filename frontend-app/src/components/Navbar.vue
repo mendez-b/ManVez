@@ -52,7 +52,7 @@
       </RouterLink>
 
       <!-- Avatar con menú desplegable -->
-      <div v-else class="avatar-menu" ref="avatarMenu">
+      <div v-else class="avatar-menu" v-show="!searchOpen" ref="avatarMenu">
         <button class="avatar-btn" @click="toggleDropdown">
           <img :src="avatarUrl" alt="Perfil" class="avatar-img" />
         </button>
