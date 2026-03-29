@@ -33,29 +33,15 @@
         </div>
       </div>
 
-      <!-- Nombre -->
       <div class="field-group">
         <label class="field-label">Nombre</label>
-        <input
-          v-model="form.username"
-          type="text"
-          class="field-input"
-          placeholder="Tu nombre"
-          maxlength="50"
-        />
+        <input v-model="form.username" type="text" class="field-input" placeholder="Tu nombre" maxlength="50" />
         <span class="field-count">{{ form.username?.length || 0 }}/50</span>
       </div>
 
-      <!-- Descripción -->
       <div class="field-group">
         <label class="field-label">Descripción</label>
-        <textarea
-          v-model="form.bio"
-          class="field-input field-textarea"
-          placeholder="Cuéntanos algo sobre ti..."
-          maxlength="160"
-          rows="3"
-        ></textarea>
+        <textarea v-model="form.bio" class="field-input field-textarea" placeholder="Cuéntanos algo sobre ti..." maxlength="160" rows="3"></textarea>
         <span class="field-count">{{ form.bio?.length || 0 }}/160</span>
       </div>
 
@@ -76,11 +62,11 @@ const successMsg = ref('')
 const errorMsg   = ref('')
 const API        = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
-const form = ref({ username: '', bio: '' })
+const form          = ref({ username: '', bio: '' })
 const previewAvatar = ref('')
 const previewBanner = ref('')
-const newAvatar     = ref(null) // base64 nueva imagen
-const newBanner     = ref(null) // base64 nueva portada
+const newAvatar     = ref(null)
+const newBanner     = ref(null)
 
 const bannerStyle = computed(() => {
   if (previewBanner.value) {
@@ -113,18 +99,7 @@ async function onBannerChange(e) {
   newBanner.value = b64
 }
 
-() {
-  saving.value  = true
-  errorMsg.value = ''
-
-  try {
-    const stored = JSON.parse(localStorage.getItem('user_data') || '{}')
-
-    const body = {
-      user_id:  stored.id,
-      username: form.value.username,
-      bio:      form.value.bio,
-    async function saveProfile() {
+async function saveProfile() {
   saving.value   = true
   errorMsg.value = ''
 
