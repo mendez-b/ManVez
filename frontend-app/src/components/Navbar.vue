@@ -120,6 +120,11 @@
           <LogOut :size="20" />
           Cerrar sesión
         </button>
+        <button class="side-menu__item side-menu__item--btn" @click="toggleTheme; closeMenu()">
+        <Sun v-if="!isDark" :size="20" />
+          <Moon v-else :size="20" />
+          {{ isDark ? 'Modo claro' : 'Modo oscuro' }}
+        </button>
       </nav>
     </div>
   </nav>
@@ -576,7 +581,8 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .nav-links,
   .login-btn,
-  .search-bar--desktop {
+  .search-bar--desktop,
+  .theme-btn {
     display: none;
   }
 
