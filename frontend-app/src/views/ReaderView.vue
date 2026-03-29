@@ -116,6 +116,28 @@ const currentIndex = computed(() =>
 const hasPrev = computed(() => currentIndex.value < chapters.value.length - 1) // hay capítulo más antiguo
 const hasNext = computed(() => currentIndex.value > 0) // hay capítulo más nuevo
 
+function saveToHistory() {
+  const mangaId = route.params.mangaId
+  const history = JSON.parse(localStorage.getItem('reading_history') || '[]')
+  
+  // Buscar si ya existe este manga en el historial
+  const existingIndex = history.findIndex(h => h.mangaId === mangaId)
+  
+  const entry = {
+    mangaId,
+    chapterId: currentChapter.value,
+    title: chapters.value.find(c => c.id === currentChapter.value)?.attributes?.title || '',
+    chapter: chapters.value.find(c => c.id === currentChapter.value)?.attributes?.chapter || '?',
+    cover: `https://uploads.mangadex.org/covers/${mangaId}/${mangaId}.512.jpg`,
+    readAt: new Date().toISOString()
+  }
+
+  if (existingIndex !== -1) {
+    history.splice(existingIndex, 1)
+  }
+  history.unshift(entry) // Agregar al inicio
+  localStorage.setItem('reading_history', JSON.stringify(history.slice(0, 50))) // Máximo 50
+}
 async function loadChapters() {
   try {
     const res = await axios.get(
@@ -161,6 +183,7 @@ async function loadChapter() {
   } catch (err) {
     console.error("Error al cargar las páginas del capítulo:", err)
     pages.value = []
+    saveToHistory()
   } finally {
     loading.value = false
   }

@@ -110,12 +110,19 @@
         </div>
       </div>
 
+      <!-- Historial -->
       <div v-if="activeTab === 'history'">
-        <div class="empty-state">
-          <Clock :size="40" />
-          <p>Tu historial de lectura está vacío</p>
-        </div>
-      </div>
+        <div v-if="history.length === 0" class="empty-state">
+           <Clock :size="40" />
+           <p>Tu historial de lectura está vacío</p>
+         </div>
+         <div v-else class="manga-grid">
+           <RouterLink v-for="item in history" :key="item.mangaId" :to="`/manga/${item.mangaId}`" class="manga-card">
+            <img :src="item.cover" :alt="item.title" />
+            <p>Cap. {{ item.chapter }}</p>
+         </RouterLink>
+       </div>
+     </div>
 
     </div>
   </div>
