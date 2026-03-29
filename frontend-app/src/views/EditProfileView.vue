@@ -134,6 +134,9 @@ async function saveProfile() {
     body: JSON.stringify(body)
   })
 
+  const text = await response.text()
+console.log('Response:', text)
+
     if (response.ok) {
       const data = await response.json()
       localStorage.setItem('user_data', JSON.stringify(data.user))
