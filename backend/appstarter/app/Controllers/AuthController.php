@@ -125,8 +125,9 @@ class AuthController extends ResourceController
     }
 
     public function updateProfile()
-    {
-        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    {   
+        return $this->response->setJSON(['message' => 'Llegué al controlador']);
+       /* $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
         $allowed = ['http://localhost:5173', 'https://last-king.vercel.app'];
         if (in_array($origin, $allowed)) {
             header("Access-Control-Allow-Origin: $origin");
@@ -175,8 +176,8 @@ class AuthController extends ResourceController
                 'bio'        => $updated['bio']        ?? null,
                 'created_at' => $updated['created_at'] ?? null,
             ]
-        ]);
-    }
+        ]);/*/
+    } 
 
     public function test()
     {
