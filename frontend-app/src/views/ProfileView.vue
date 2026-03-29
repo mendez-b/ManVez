@@ -133,6 +133,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Calendar, BookOpen, CheckCircle, XCircle, Clock, Heart } from 'lucide-vue-next'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const history = ref([])
 
 const user = ref({
   id: null, username: '', email: '',
@@ -204,6 +205,7 @@ async function loadLists() {
 onMounted(async () => {
   await loadUser()
   await loadLists()
+  history.value = JSON.parse(localStorage.getItem('reading_history') || '[]')
 })
 </script>
 
