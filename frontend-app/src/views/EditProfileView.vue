@@ -102,36 +102,39 @@ async function onBannerChange(e) {
 async function saveProfile() {
   saving.value   = true
   errorMsg.value = ''
+  successMsg.value = ''
 
   try {
     const stored = JSON.parse(localStorage.getItem('user_data') || '{}')
 
-    const body = {
+    const payload = {
       user_id:  stored.id,
       username: form.value.username,
       bio:      form.value.bio,
     }
-    if (newAvatar.value) body.avatar = newAvatar.value
-    if (newBanner.value) body.banner = newBanner.value
 
-    const response = await fetch(`${API}/update-profile`, {
-      method: 'POST',
+    if (avatarBase64.value) {
+      payload.profile_pic = avatarBase64.value
+    }
+
+    const response = await fetch(`${API}/profile`, {
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body:    JSON.stringify(payload)
     })
 
-    const text = await response.text()
-    console.log('Response status:', response.status)
-    console.log('Response body:', text)
-
     if (response.ok) {
-      const data = JSON.parse(text)
-      localStorage.setItem('user_data', JSON.stringify(data.user))
-      window.dispatchEvent(new Event('user-login'))
+      const data = await response.json()
+
+      // ✅ CLAVE: actualizar localStorage con los datos nuevos (incluye la foto)
+      const updatedUser = { ...stored, ...data.user }
+      localStorage.setItem('user_data', JSON.stringify(updatedUser))
+
       successMsg.value = '¡Perfil actualizado!'
       setTimeout(() => router.push('/profile'), 1200)
     } else {
-      errorMsg.value = 'Error: ' + text
+      const err = await response.json()
+      errorMsg.value = err.error || 'Error al actualizar perfil.'
     }
   } catch (err) {
     console.error(err)
