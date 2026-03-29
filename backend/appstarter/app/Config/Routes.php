@@ -15,7 +15,7 @@ $routes->get('/', 'Home::index');
 $routes->post('login', 'AuthController::login');
 $routes->post('register', 'AuthController::register');
 $routes->post('forgot-password', 'AuthController::forgotPassword');
-$routes->post('profile', 'AuthController::updateProfile');
+$routes->post('update-profile', 'AuthController::updateProfile');
 
 $routes->options('(:any)', static function () {
     return service('response')->setStatusCode(200);
