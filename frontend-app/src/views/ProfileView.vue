@@ -1,12 +1,10 @@
 <template>
   <div class="profile-page">
 
-    <!-- Banner -->
     <div class="profile-banner" :style="bannerStyle">
       <div v-if="!user.banner" class="banner-bg"></div>
     </div>
 
-    <!-- Header del perfil -->
     <div class="profile-header">
       <div class="avatar-wrap">
         <img :src="avatarUrl" alt="Avatar" class="avatar-img" />
@@ -26,7 +24,6 @@
       <RouterLink to="/profile/edit" class="edit-btn">Editar perfil</RouterLink>
     </div>
 
-    <!-- Stats -->
     <div class="profile-stats">
       <div class="stat">
         <span class="stat-value">{{ stats.reading }}</span>
@@ -46,7 +43,6 @@
       </div>
     </div>
 
-    <!-- Tabs -->
     <div class="profile-tabs">
       <button
         v-for="tab in tabs"
@@ -60,10 +56,8 @@
       </button>
     </div>
 
-    <!-- Contenido tabs -->
     <div class="profile-content">
 
-      <!-- Favoritos -->
       <div v-if="activeTab === 'favorites'">
         <div v-if="mangaLists.favorites.length === 0" class="empty-state">
           <Heart :size="40" />
@@ -77,7 +71,6 @@
         </div>
       </div>
 
-      <!-- Leyendo -->
       <div v-if="activeTab === 'reading'">
         <div v-if="mangaLists.reading.length === 0" class="empty-state">
           <BookOpen :size="40" />
@@ -91,7 +84,6 @@
         </div>
       </div>
 
-      <!-- Completados -->
       <div v-if="activeTab === 'completed'">
         <div v-if="mangaLists.completed.length === 0" class="empty-state">
           <CheckCircle :size="40" />
@@ -105,7 +97,6 @@
         </div>
       </div>
 
-      <!-- Abandonados -->
       <div v-if="activeTab === 'abandoned'">
         <div v-if="mangaLists.abandoned.length === 0" class="empty-state">
           <XCircle :size="40" />
@@ -119,7 +110,6 @@
         </div>
       </div>
 
-      <!-- Historial -->
       <div v-if="activeTab === 'history'">
         <div class="empty-state">
           <Clock :size="40" />
@@ -128,7 +118,6 @@
       </div>
 
     </div>
-
   </div>
 </template>
 
@@ -136,22 +125,16 @@
 import { ref, computed, onMounted } from 'vue'
 import { Calendar, BookOpen, CheckCircle, XCircle, Clock, Heart } from 'lucide-vue-next'
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 const user = ref({
-  id: null,
-  username: '',
-  email: '',
-  profile_pic: null,
-  profile_pic_url: null,
-  banner: null,
-  bio: '',
-  created_at: null
+  id: null, username: '', email: '',
+  profile_pic: null, banner: null, bio: '', created_at: null
 })
 
 const avatarUrl = computed(() => {
-  // Buscar tanto 'profile_pic' como 'avatar' por compatibilidad
   const pic = user.value.profile_pic || user.value.avatar
   if (pic) return pic
-  if (user.value.email) return gravatarUrl(user.value.email, 128)
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.username || 'U')}&background=1AAD4B&color=fff&size=128`
 })
 
@@ -171,7 +154,7 @@ const joinedDate = computed(() => {
 const mangaLists = ref({ favorites: [], reading: [], completed: [], abandoned: [] })
 
 const stats = computed(() => ({
-  reading: mangaLists.value.reading.length,
+  reading:   mangaLists.value.reading.length,
   completed: mangaLists.value.completed.length,
   abandoned: mangaLists.value.abandoned.length,
   favorites: mangaLists.value.favorites.length,
@@ -187,15 +170,12 @@ const tabs = [
   { key: 'history',   label: 'Historial',    icon: Clock },
 ]
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-
 async function loadUser() {
   try {
     const stored = localStorage.getItem('user_data')
     if (stored && JSON.parse(stored).id) {
       const data = JSON.parse(stored)
       user.value = { ...user.value, ...data }
-      // Compatibilidad: el backend a veces devuelve 'avatar' en vez de 'profile_pic'
       if (!user.value.profile_pic && data.avatar) {
         user.value.profile_pic = data.avatar
       }
@@ -205,15 +185,38 @@ async function loadUser() {
   }
 }
 
-onMounted(async () => {
-  await loadUser()
+async function loadLists() {
+  // Si hay sesión, cargar desde BD
+  if (user.value.id) {
+    try {
+      const res  = await fetch(`${API}/manga-list?user_id=${user.value.id}`)
+      const data = await res.json()
+      if (data.status && data.lists) {
+        mangaLists.value = {
+          favorites: data.lists.favorites || [],
+          reading:   data.lists.reading   || [],
+          completed: data.lists.completed || [],
+          abandoned: data.lists.abandoned || [],
+        }
+        return
+      }
+    } catch (err) {
+      console.error('Error cargando listas desde BD:', err)
+    }
+  }
 
+  // Fallback: localStorage
   const saved = JSON.parse(localStorage.getItem('manga_lists') || '{}')
   const lists = { favorites: [], reading: [], completed: [], abandoned: [] }
   Object.values(saved).forEach(m => {
     if (lists[m.list]) lists[m.list].push(m)
   })
   mangaLists.value = lists
+}
+
+onMounted(async () => {
+  await loadUser()
+  await loadLists()
 })
 </script>
 
@@ -257,11 +260,7 @@ onMounted(async () => {
   background: var(--bg-secondary);
 }
 
-.profile-info {
-  flex: 1;
-  min-width: 0;
-  padding-top: 52px;
-}
+.profile-info { flex: 1; min-width: 0; padding-top: 52px; }
 
 .profile-name {
   font-size: 1.4rem;
@@ -270,24 +269,9 @@ onMounted(async () => {
   margin: 0 0 2px;
 }
 
-.profile-handle {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin: 0 0 4px;
-}
-
-.profile-email {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  margin: 0 0 4px;
-}
-
-.profile-bio {
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  margin: 0 0 6px;
-  line-height: 1.5;
-}
+.profile-handle { color: var(--text-secondary); font-size: 0.9rem; margin: 0 0 4px; }
+.profile-email  { color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 4px; }
+.profile-bio    { color: var(--text-primary); font-size: 0.9rem; margin: 0 0 6px; line-height: 1.5; }
 
 .profile-joined {
   display: flex;
@@ -321,23 +305,9 @@ onMounted(async () => {
   border-bottom: 1px solid var(--border);
 }
 
-.stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.stat-value {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: var(--text-primary);
-}
-
-.stat-label {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-}
+.stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.stat-value { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); }
+.stat-label { font-size: 0.78rem; color: var(--text-secondary); }
 
 .profile-tabs {
   display: flex;
@@ -363,12 +333,8 @@ onMounted(async () => {
   transition: color 0.2s, border-color 0.2s;
 }
 
-.tab-btn--active {
-  color: var(--accent, #1AAD4B);
-  border-bottom-color: var(--accent, #1AAD4B);
-}
-
-.tab-btn:hover { color: var(--text-primary); }
+.tab-btn--active { color: var(--accent, #1AAD4B); border-bottom-color: var(--accent, #1AAD4B); }
+.tab-btn:hover   { color: var(--text-primary); }
 
 .profile-content { padding: 24px; }
 
@@ -388,9 +354,7 @@ onMounted(async () => {
   gap: 16px;
 }
 
-.manga-card {
-  text-decoration: none;
-}
+.manga-card { text-decoration: none; }
 
 .manga-card img {
   width: 100%;
@@ -400,9 +364,7 @@ onMounted(async () => {
   transition: transform 0.2s;
 }
 
-.manga-card:hover img {
-  transform: scale(1.03);
-}
+.manga-card:hover img { transform: scale(1.03); }
 
 .manga-card p {
   font-size: 0.8rem;
@@ -413,9 +375,8 @@ onMounted(async () => {
 
 @media (max-width: 600px) {
   .profile-header { padding: 0 16px 16px; }
-  .profile-stats { gap: 16px; padding: 16px; justify-content: space-around; }
-  .edit-btn { width: 100%; text-align: center; margin-top: 12px; }
-  .profile-info { padding-top: 12px; }
+  .profile-stats  { gap: 16px; padding: 16px; justify-content: space-around; }
+  .edit-btn       { width: 100%; text-align: center; margin-top: 12px; }
+  .profile-info   { padding-top: 12px; }
 }
-
 </style>
