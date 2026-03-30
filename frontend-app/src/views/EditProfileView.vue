@@ -117,6 +117,10 @@ async function saveProfile() {
       payload.profile_pic = newAvatar.value
     }
 
+    if (newBanner.value) {
+      payload.banner = newBanner.value
+    }
+
     const response = await fetch(`${API}/update-profile`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -127,8 +131,13 @@ async function saveProfile() {
       const data = await response.json()
 
       // ✅ CLAVE: actualizar localStorage con los datos nuevos (incluye la foto)
-      const updatedUser = { ...stored, ...data.user }
-      localStorage.setItem('user_data', JSON.stringify(updatedUser))
+      const updatedUser = { 
+         ...stored, 
+         ...data.user,
+         avatar: data.user.profile_pic || stored.avatar  // ← sincronizar avatar y profile_pic
+         banner: newBanner.value || stored.banner
+       }
+       localStorage.setItem('user_data', JSON.stringify(updatedUser))
 
       successMsg.value = '¡Perfil actualizado!'
       setTimeout(() => router.push('/profile'), 1200)
