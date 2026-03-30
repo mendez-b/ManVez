@@ -134,7 +134,7 @@ async function saveProfile() {
       const updatedUser = { 
          ...stored, 
          ...data.user,
-         avatar: data.user.profile_pic || stored.avatar  // ← sincronizar avatar y profile_pic
+         avatar: data.user.profile_pic || stored.avatar,  // ← sincronizar avatar y profile_pic
          banner: newBanner.value || stored.banner
        }
        localStorage.setItem('user_data', JSON.stringify(updatedUser))
