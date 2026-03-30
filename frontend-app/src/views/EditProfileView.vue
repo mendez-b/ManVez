@@ -139,6 +139,7 @@ async function saveProfile() {
          banner: newBanner.value || stored.banner
        }
        localStorage.setItem('user_data', JSON.stringify(updatedUser))
+       window.dispatchEvent(new Event('user-updated'))
 
       successMsg.value = '¡Perfil actualizado!'
       setTimeout(() => {

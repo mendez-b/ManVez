@@ -192,11 +192,13 @@ function closeMenu() { menuOpen.value = false }
 onMounted(() => {
   checkAuth()
   window.addEventListener('user-login', checkAuth)
+  window.addEventListener('user-updated', checkAuth)
   document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('user-updated', checkAuth)
 })
 </script>
 
