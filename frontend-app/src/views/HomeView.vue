@@ -54,13 +54,13 @@ onMounted(async () => {
   try {
     
     const popRes = await axios.get(
-      `${BASE}/manga?limit=5&order[followedCount]=desc&includes[]=cover_art&contentRating[]=safe`
+      `${BASE}/manga?limit=5&order[followedCount]=desc&includes[]=cover_art&contentRating[]=safe&availableTranslatedLanguage[]=es`
     )
     popularMangas.value = popRes.data.data
     loadingPopular.value = false
 
     const recRes = await axios.get(
-      `${BASE}/manga?limit=30&order[updatedAt]=desc&includes[]=cover_art&contentRating[]=safe`
+      `${BASE}/manga?limit=30&order[updatedAt]=desc&includes[]=cover_art&contentRating[]=safe&availableTranslatedLanguage[]=es`
     )
     recentMangas.value = recRes.data.data
     loadingRecent.value = false
