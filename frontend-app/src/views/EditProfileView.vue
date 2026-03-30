@@ -140,7 +140,9 @@ async function saveProfile() {
        localStorage.setItem('user_data', JSON.stringify(updatedUser))
 
       successMsg.value = '¡Perfil actualizado!'
-      setTimeout(() => router.push('/profile'), 1200)
+      setTimeout(() => {
+        window.localStorage.href = '/profile'
+      }, 1200)
     } else {
       const err = await response.json()
       errorMsg.value = err.error || 'Error al actualizar perfil.'
