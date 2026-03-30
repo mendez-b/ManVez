@@ -129,7 +129,7 @@ async function saveProfile() {
 
     if (response.ok) {
      const data = await response.json()
-     console.log('respuesta backend:', data.user?.profile_pic?.substring(0, 50))
+     console.log('avatar del backend:', data.user?.avatar?.substring(0, 50))
 
       // ✅ CLAVE: actualizar localStorage con los datos nuevos (incluye la foto)
       const updatedUser = { 
