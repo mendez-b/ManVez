@@ -140,7 +140,8 @@ async function search() {
       limit: LIMIT,
       offset: offset.value,
       'contentRating[]': 'safe',
-      'includes[]': 'cover_art'
+      'includes[]': 'cover_art',
+      'availableTranslatedLanguage[]': 'es'
     })
 
     // 2. Si hay texto en el buscador, lo añadimos
