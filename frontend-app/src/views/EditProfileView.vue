@@ -114,7 +114,7 @@ async function saveProfile() {
     }
 
     if (newAvatar.value) {
-      payload.profile_pic = newAvatar.value
+      payload.avatar = newAvatar.value
     }
 
     if (newBanner.value) {
