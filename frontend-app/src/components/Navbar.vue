@@ -141,7 +141,7 @@ function checkAuth() {
   const stored = localStorage.getItem('user_data')
   if (stored) {
     try {
-      userData.value = {...JSON.parse(store) }
+      userData.value = JSON.parse(store) 
       console.log('checkAuth avatar:', userData.value?.avatar?.substring(0, 50))
      } catch {}
   }
