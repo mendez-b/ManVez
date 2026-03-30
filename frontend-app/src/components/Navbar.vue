@@ -140,7 +140,10 @@ function checkAuth() {
   isLoggedIn.value = !!localStorage.getItem('user_token')
   const stored = localStorage.getItem('user_data')
   if (stored) {
-    try { userData.value = JSON.parse(stored) } catch {}
+    try {
+      userData.value = JSON.parse(stored)
+      console.log('checkAuth avatar:', userData.value?.avatar?.substring(0, 50))
+     } catch {}
   }
 }
 
